@@ -3,5 +3,14 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
+  },
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    ".expo": true,
+    "dist": true,
+    "ios": true,
+    "android": true,
+    ".local": true
   }
 }

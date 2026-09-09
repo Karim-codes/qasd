@@ -1,54 +1,46 @@
-# Welcome to your Expo app 👋
+# Qasd
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A local-first companion for Hajj and Umrah, built with Expo, React Native and TypeScript.
 
-## Get started
+## Development
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Public repository safety
-
-Local environment files, Supabase CLI state, signing keys, generated native folders, and personal itinerary exports are excluded from Git. Never commit credentials to this repository. If configuration is added later, put real values in `.env` and commit only a sanitized `.env.example` with placeholder values.
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```sh
+npm install
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Use `npm run ios`, `npm run android` or `npm run web` for the relevant platform. After moving from the old project structure, restart Metro with `npx expo start --clear` so it discovers `src/app`.
 
-## Learn more
+## Project structure
 
-To learn more about developing your project with Expo, look at the following resources:
+| Folder | Purpose |
+| --- | --- |
+| `src/app/` | Expo Router routes and layouts, including both onboarding flows |
+| `src/features/` | Feature-specific screens and UI; flight tickets live here |
+| `src/components/` | Shared UI and onboarding form components |
+| `src/constants/` | Qasd theme, typography and design tokens |
+| `src/context/` | Itinerary and onboarding state providers |
+| `src/hooks/` | Reusable hooks and local progress subscriptions |
+| `src/lib/` | Date helpers, itinerary models, persistence and parsing |
+| `assets/brand/` | Supplied Qasd artwork and platform icon assets |
+| `modules/` | Local native Expo modules |
+| `tests/` | Focused domain and persistence tests |
+| `scripts/` | Asset preparation and project tooling |
+| `docs/` | Design notes, previews and archived starter material |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+`@/` resolves to `src/`; `@assets/` resolves to `assets/`. Keep new shared code out of route files when it can live with its feature.
 
-## Join the community
+Open `Qasd.code-workspace` to display the workspace as **Qasd**. Generated folders (`node_modules`, `.expo`, `dist`, `ios`, `android`) are hidden in the editor Explorer but remain on disk. Personal itinerary exports and working notes live in ignored `.local/` and are never app assets.
 
-Join our community of developers creating universal apps.
+## Useful commands
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `npm run typecheck` — TypeScript validation (Expo generates route types when started).
+- `npm test` — focused domain and persistence tests.
+- `node scripts/prepare-brand-assets.cjs` — package the supplied logo for app icons and splash images.
+- `npm run build:ios` — existing EAS production build workflow.
+
+## Branding and continuity
+
+The visible app name is **Qasd**. The original EAS project slug, project ID, bundle identifier and local storage keys are deliberately retained so existing installs, builds and saved journeys continue to work. `qasd://` is supported alongside the original URL scheme. Provider names inside imported itinerary data are not app branding.
+
+App icon, splash and device display-name changes appear in a new native build; Metro refresh alone cannot replace an installed app icon. The local iOS display name and image catalog are refreshed as well as Expo config. The existing Xcode target name remains stable.

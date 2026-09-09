@@ -54,3 +54,6 @@ app-example
 *.pdf
 simulator_screenshot_*.png
 Hajj - my hajj Itinerary.*
+
+# Personal working files and exported itineraries
+.local/
