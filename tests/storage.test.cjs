@@ -5,7 +5,12 @@ const values = new Map();
 const writes = [];
 const memory = {
   async getItem(key) { return values.get(key) ?? null; },
-  async setItem(key, value) { writes.push(JSON.parse(value).pilgrim?.name); values.set(key, value); },
+  async setItem(key, value) {
+    const parsed = JSON.parse(value);
+    const name = parsed.pilgrim?.name ?? parsed.pilgrims?.[parsed.trip?.primaryPilgrimId]?.name;
+    if (name !== undefined) writes.push(name);
+    values.set(key, value);
+  },
   async multiRemove(keys) { keys.forEach(key => values.delete(key)); },
 };
 const originalLoad = Module._load;
@@ -26,6 +31,9 @@ test('legacy trip retains a stable identity and sanitizes retired sensitive fiel
   assert.equal(trip.visa, undefined);
   assert.equal(trip.documents, undefined);
   assert.equal(JSON.parse(values.get('@rawaf_itinerary')).localId, 'legacy');
+  const migrated = JSON.parse(values.get('@qasd_trip_v2'));
+  assert.equal(migrated.schemaVersion, 2);
+  assert.equal(migrated.trip.primaryPilgrimId, 'legacy:pilgrim:primary');
 });
 test('corrupt original backup does not hide current offline itinerary', async () => {
   values.clear();
@@ -45,4 +53,5 @@ test('rapid itinerary edits persist in order and clear waits for pending writes'
   const pending = storage.saveItinerary(second);
   await storage.clearItinerary(); await pending;
   assert.equal(values.has('@rawaf_itinerary'), false);
+  assert.equal(values.has('@qasd_trip_v2'), false);
 });

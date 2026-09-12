@@ -6,6 +6,8 @@ const { getHomeAction } = require('../src/lib/home-action.ts');
 const { buildSteps, getNextJourneyStep } = require('../src/lib/journey.ts');
 const { EMPTY_ITINERARY } = require('../src/lib/sample-data.ts');
 const { parseDate } = require('../src/lib/date-helpers.ts');
+const { EMPTY_CHECKLIST } = require('../src/lib/checklist.ts');
+const { itineraryFromTripRecord, mergeItineraryIntoTripRecord, normalizeItinerary } = require('../src/lib/trip.ts');
 const clone = value => structuredClone(value);
 function memory() {
   const values = new Map();
@@ -35,6 +37,7 @@ test('counter ignores duplicate taps, clamps at 7, and keeps counters independen
   assert.equal(changeCounter(value, 'tawaf', 'add', 1200), value);
   for (let i = 2; i < 12; i++) value = changeCounter(value, 'tawaf', 'add', i * 1000);
   assert.equal(value.counters.tawaf.count, 7);
+  assert.equal(value.completed['tawaf-start'], true);
   assert.equal(value.counters.sai.count, 0);
   value = changeCounter(value, 'sai', 'add', 12000);
   value = changeCounter(value, 'tawaf', 'reset', 13000);
@@ -104,6 +107,30 @@ test('bookmarks and journey completions survive restart', async () => {
     assert.equal(restored.getSnapshot().value.saved, true);
   }
 });
+test('legacy local progress migrates once into the trip and pilgrim scoped key', async () => {
+  const storage = memory();
+  storage.values.set('old-progress', JSON.stringify({ saved: true }));
+  const record = createLocalRecord(storage, 'new-progress', {}, booleanMap, ['old-progress']);
+  await record.hydrate();
+  assert.equal(record.getSnapshot().value.saved, true);
+  assert.deepEqual(JSON.parse(storage.values.get('new-progress')), { saved: true });
+});
+test('onboarding itinerary normalizes without asking for trip data again', () => {
+  const value = trip('madinah-makkah');
+  value.localId = 'trip-1'; value.pilgrim.name = 'Karim';
+  value.flights.outbound.arrivalCity = 'Jeddah (JED)';
+  const record = normalizeItinerary(value, new Date('2026-01-01T00:00:00Z'));
+  assert.equal(record.schemaVersion, 2);
+  assert.equal(record.pilgrims[record.trip.primaryPilgrimId].name, 'Karim');
+  assert.equal(record.trip.flights[0].arrivalTimeZone, 'Asia/Riyadh');
+  assert.deepEqual(record.trip.stays.map(stay => stay.kind), ['madinah', 'makkah']);
+  assert.equal(itineraryFromTripRecord(record).umrah.route, 'madinah-makkah');
+  record.trip.journeyEvents.push({ id: 'operator-1', type: 'custom', title: 'Meet your group', source: 'operator' });
+  const edited = itineraryFromTripRecord(record); edited.pilgrim.name = 'Karim A';
+  const merged = mergeItineraryIntoTripRecord(record, edited);
+  assert.equal(merged.trip.journeyEvents[0].id, 'operator-1');
+  assert.equal(merged.pilgrims[merged.trip.primaryPilgrimId].name, 'Karim A');
+});
 test('home and journey use the same next step and advance after hotel completion', () => {
   const value = trip(); const completed = {};
   const steps = buildSteps(value).phases.flatMap(phase => phase.steps);
@@ -113,11 +140,45 @@ test('home and journey use the same next step and advance after hotel completion
   assert.equal(getNextJourneyStep(steps, completed).id, 'umrah-rites');
   assert.equal(getHomeAction(value, completed, EMPTY_GUIDE).step, 'ihram');
 });
-test('home resumes saved counter and gives tomorrow return flight priority', () => {
+test('active ritual stays above an ordinary tomorrow flight', () => {
   const value = trip(); const progress = changeCounter(clone(EMPTY_GUIDE), 'tawaf', 'add', 1000);
   assert.equal(getHomeAction(value, {}, progress).step, 'tawaf-start');
   value.flights.return.departureDate = date(1);
-  assert.equal(getHomeAction(value, {}, progress).journeyStep, 'depart-saudi');
+  assert.equal(getHomeAction(value, {}, progress).title, 'Continue Tawaf');
+});
+test('a reliably timed flight within six hours can override an active ritual', () => {
+  const value = trip(); const progress = changeCounter(clone(EMPTY_GUIDE), 'tawaf', 'add', 1000);
+  value.flights.return = {
+    ...value.flights.return,
+    departureCity: 'Madinah (MED)', departureDate: '2026-09-11', departureTime: '14:00', departureTimeZone: 'Asia/Riyadh',
+  };
+  const action = getHomeAction(value, {}, progress, new Date('2026-09-11T10:00:00Z'));
+  assert.equal(action.journeyStep, 'depart-saudi');
+});
+test('preparation checklist feeds the Home action engine', () => {
+  const value = trip();
+  value.flights.outbound.departureDate = date(5);
+  value.hotels.hotel1.checkIn = date(6); value.hotels.hotel1.checkOut = date(8);
+  value.hotels.hotel2.checkIn = date(8); value.hotels.hotel2.checkOut = date(10);
+  const checklist = clone(EMPTY_CHECKLIST);
+  checklist.completed = { passport: true, visa: true };
+  const action = getHomeAction(value, {}, EMPTY_GUIDE, new Date(), checklist);
+  assert.equal(action.route, '/checklist');
+  assert.match(action.detail, /2 of 10/);
+});
+test('Home resumes the next saved guide step when no urgent travel action exists', () => {
+  const value = trip(); const guide = clone(EMPTY_GUIDE);
+  guide.completed = { ihram: true };
+  const action = getHomeAction(value, { 'hotel-makkah': true }, guide);
+  assert.equal(action.step, 'enter-masjid');
+});
+test('Madinah-first Ihram advice uses trip order without claiming Miqat proximity', () => {
+  const value = trip('madinah-makkah');
+  value.hotels.hotel2.checkIn = date(1);
+  const action = getHomeAction(value, {}, EMPTY_GUIDE);
+  assert.equal(action.title, 'Prepare for Ihram');
+  assert.match(action.detail, /Madinah to Makkah/);
+  assert.doesNotMatch(action.detail, /approaching Miqat/i);
 });
 test('Madinah-first route stays in city order, browsing does not begin a ritual', () => {
   const value = trip('madinah-makkah'); const progress = clone(EMPTY_GUIDE); progress.lastStep = 'sai-laps';

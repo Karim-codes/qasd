@@ -1,10 +1,10 @@
 import { Palette, QasdFonts } from '@/constants/qasd-theme';
 import { useItinerary } from '@/context/itinerary-context';
-import { useGuideProgress, useJourneyProgress } from '@/hooks/use-local-progress';
+import { useGuideProgress, useJourneyProgress, usePreparationChecklist } from '@/hooks/use-local-progress';
 import { useNow } from '@/hooks/use-now';
 import { LocalSaveStatus } from '@/components/local-save-status';
 import { daysBetween, daysUntil, formatDateShort, getCurrentStay, getNextOrCurrentStay } from '@/lib/date-helpers';
-import { getHomeAction } from '@/lib/home-action';
+import { getNextJourneyAction } from '@/lib/home-action';
 import { buildSteps } from '@/lib/journey';
 import { AppIcon as Ionicons } from '@/components/app-icon';
 import { useRouter } from 'expo-router';
@@ -152,20 +152,22 @@ function WeatherTile({ city }: { city: string }) {
 
 export default function HomeTab() {
   const router = useRouter();
-  const { itinerary, isLoading } = useItinerary();
+  const { itinerary, trip, isLoading } = useItinerary();
   const journey = useJourneyProgress();
   const guide = useGuideProgress();
-  const now = useNow();
+  const checklist = usePreparationChecklist();
+  const nowValue = useNow();
+  const now = new Date(nowValue);
   useEffect(() => { if (!isLoading && !itinerary) router.replace('/'); }, [isLoading, itinerary, router]);
-  if (!itinerary) return null;
+  if (!itinerary || !trip) return null;
 
-  const { tripType, phases } = buildSteps(itinerary);
+  const { tripType, phases } = buildSteps(itinerary, now);
   const isUmrah = tripType === 'umrah';
   const firstName = itinerary.pilgrim.name.trim().split(/\s+/)[0] || 'Pilgrim';
   const departure = itinerary.flights.outbound.departureDate;
   const arrivalHome = itinerary.flights.return.arrivalDate;
-  const daysLeft = daysUntil(departure);
-  const daysHome = daysUntil(arrivalHome);
+  const daysLeft = daysUntil(departure, now);
+  const daysHome = daysUntil(arrivalHome, now);
   const tripDays = daysBetween(departure, arrivalHome);
   const inProgress = daysLeft !== null && daysLeft <= 0 && daysHome !== null && daysHome >= 0;
   const status = inProgress ? `Day ${1 - daysLeft} of ${(tripDays ?? 0) + 1}` : daysLeft !== null && daysLeft > 0 ? `In ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}` : daysHome !== null && daysHome < 0 ? 'Journey complete' : 'Your journey';
@@ -173,10 +175,15 @@ export default function HomeTab() {
   const stay = getNextOrCurrentStay(itinerary.hotels);
   const cities = itinerary.umrah?.route === 'madinah-makkah' ? ['Madinah', 'Makkah'] : itinerary.umrah?.route === 'makkah-only' ? ['Makkah'] : ['Makkah', 'Madinah'];
   const city = currentStay?.city || stay?.city || cities[0];
-  const action = getHomeAction(itinerary, journey.value, guide.value);
+  const action = getNextJourneyAction(trip, { journeyCompleted: journey.value, guide: guide.value, checklist: checklist.value }, now);
+  const actionIcon = action.type === 'flight' ? 'airplane-outline'
+    : action.type === 'stay' ? 'bed-outline'
+      : action.type === 'checklist' ? 'checkmark-done-outline'
+        : action.type === 'ritual' ? 'compass-outline'
+          : 'map-outline';
   const steps = phases.flatMap(phase => phase.steps);
   const completed = steps.filter(step => journey.value[step.id]).length;
-  const ready = journey.ready && guide.ready;
+  const ready = journey.ready && guide.ready && checklist.ready;
 
   return <SafeAreaView style={styles.container} edges={['top']}>
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -210,7 +217,7 @@ export default function HomeTab() {
       <View style={styles.nextCard}>
         <View style={styles.rowBetween}>
           <Text style={styles.nextEyebrow}>{ready ? action.eyebrow : 'Your next step'}</Text>
-          <Ionicons name="compass-outline" size={22} color="#776447" />
+          <Ionicons name={actionIcon} size={22} color="#776447" />
         </View>
         <Text style={styles.nextTitle}>{ready ? action.title : 'Getting your place…'}</Text>
         <Text style={styles.nextDetail}>{ready ? action.detail : 'Loading the progress saved on this device.'}</Text>
@@ -225,6 +232,7 @@ export default function HomeTab() {
       </View>
       {(journey.error || !journey.ready || journey.saving) && <LocalSaveStatus record={journey} />}
       {(guide.error || !guide.ready || guide.saving) && <LocalSaveStatus record={guide} />}
+      {(checklist.error || !checklist.ready || checklist.saving) && <LocalSaveStatus record={checklist} />}
 
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Your trip, at hand</Text>
@@ -241,6 +249,12 @@ export default function HomeTab() {
           <Ionicons name="book-outline" size={23} color={Palette.gold} />
           <Text style={styles.shortcutTitle}>{isUmrah ? 'Umrah guide' : 'Hajj guide'}</Text>
           <Text style={styles.smallLabel}>Read at your pace</Text>
+        </TouchableOpacity>
+        <View style={styles.shortcutDivider} />
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open preparation checklist" onPress={() => router.push('/checklist')} style={styles.shortcut}>
+          <Ionicons name="checkmark-done-outline" size={23} color={Palette.gold} />
+          <Text style={styles.shortcutTitle}>Prepare</Text>
+          <Text style={styles.smallLabel}>Your checklist</Text>
         </TouchableOpacity>
       </View>
 

@@ -29,10 +29,10 @@ export function formatDay(dateStr?: string): string {
   return d.toLocaleDateString('en-GB', { weekday: 'short' });
 }
 
-export function daysUntil(dateStr?: string): number | null {
+export function daysUntil(dateStr?: string, currentTime = new Date()): number | null {
   const d = parseDate(dateStr);
   if (!d) return null;
-  const now = new Date();
+  const now = new Date(currentTime);
   now.setHours(0, 0, 0, 0);
   d.setHours(0, 0, 0, 0);
   return Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
@@ -129,10 +129,11 @@ export function deriveHajjDays(arafahDate?: string): HajjDays | null {
 
 export function getStepStatus(
   startDate?: string,
-  endDate?: string
+  endDate?: string,
+  currentTime = new Date()
 ): 'done' | 'active' | 'upcoming' {
   if (!startDate) return 'upcoming';
-  const now = new Date();
+  const now = new Date(currentTime);
   now.setHours(0, 0, 0, 0);
   const start = parseDate(startDate);
   if (!start) return 'upcoming';

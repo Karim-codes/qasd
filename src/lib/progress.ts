@@ -32,9 +32,11 @@ export function changeCounter(value: GuideProgress, id: CounterId, action: 'add'
   const count = action === 'reset' ? 0 : Math.max(0, Math.min(7, previous.count + (action === 'add' ? 1 : -1)));
   if (count === previous.count) return value;
   const stepId = id === 'tawaf' ? 'tawaf-start' : 'sai-laps';
+  const completed = { ...value.completed, [stepId]: count === 7 };
+  if (count < 7) completed.complete = false;
   return {
     ...value, lastStep: stepId,
-    completed: count < 7 ? { ...value.completed, [stepId]: false, complete: false } : value.completed,
+    completed,
     counters: { ...value.counters, [id]: { count, changedAt: now } },
   };
 }

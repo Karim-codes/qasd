@@ -72,6 +72,7 @@ export default function RootLayout() {
             <Stack.Screen name="hajj-guide" options={{ presentation: 'card' }} />
             <Stack.Screen name="umrah-guide" options={{ presentation: 'card' }} />
             <Stack.Screen name="stays" options={{ presentation: 'card' }} />
+            <Stack.Screen name="checklist" options={{ presentation: 'card' }} />
             <Stack.Screen name="settings" options={{ presentation: 'card' }} />
           </Stack>
           <StatusBar style="light" />

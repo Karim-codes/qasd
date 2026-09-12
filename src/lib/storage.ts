@@ -1,9 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
-import type { Itinerary } from './types';
+import { isTripRecord, itineraryFromTripRecord, normalizeItinerary } from './trip';
+import type { Itinerary, TripRecord } from './types';
 
-const ITINERARY_KEY = '@rawaf_itinerary';
-const ORIGINAL_KEY = '@rawaf_itinerary_original';
+const TRIP_KEY = '@qasd_trip_v2';
+const ORIGINAL_TRIP_KEY = '@qasd_trip_original_v2';
+const LEGACY_ITINERARY_KEY = '@rawaf_itinerary';
+const LEGACY_ORIGINAL_KEY = '@rawaf_itinerary_original';
 
 type StoredItinerary = Itinerary & {
   visa?: { imageUri?: unknown };
@@ -27,7 +30,7 @@ async function removeLegacySensitiveFields(data: StoredItinerary): Promise<Itine
   return sanitized;
 }
 
-async function loadStoredItinerary(key: string): Promise<Itinerary | null> {
+async function loadLegacyItinerary(key: string): Promise<Itinerary | null> {
   const json = await AsyncStorage.getItem(key);
   if (!json) return null;
 
@@ -46,15 +49,19 @@ async function loadStoredItinerary(key: string): Promise<Itinerary | null> {
 let itineraryWrites = Promise.resolve(true);
 
 export function saveItinerary(data: Itinerary): Promise<boolean> {
-  const snapshot = JSON.parse(JSON.stringify(data)) as Itinerary;
-  itineraryWrites = itineraryWrites.then(() => writeItinerary(snapshot));
+  const snapshot = normalizeItinerary(JSON.parse(JSON.stringify(data)) as Itinerary);
+  return saveTripRecord(snapshot);
+}
+
+export function saveTripRecord(data: TripRecord): Promise<boolean> {
+  const snapshot = JSON.parse(JSON.stringify(data)) as TripRecord;
+  itineraryWrites = itineraryWrites.then(() => writeTripRecord(snapshot, TRIP_KEY));
   return itineraryWrites;
 }
 
-async function writeItinerary(data: Itinerary): Promise<boolean> {
+async function writeTripRecord(data: TripRecord, key: string): Promise<boolean> {
   try {
-    const sanitized = await removeLegacySensitiveFields(data);
-    await AsyncStorage.setItem(ITINERARY_KEY, JSON.stringify(sanitized));
+    await AsyncStorage.setItem(key, JSON.stringify(data));
     return true;
   } catch (e) {
     console.error('Failed to save itinerary:', e);
@@ -63,29 +70,59 @@ async function writeItinerary(data: Itinerary): Promise<boolean> {
 }
 
 export async function saveOriginalItinerary(data: Itinerary): Promise<boolean> {
-  try {
-    const sanitized = await removeLegacySensitiveFields(data);
-    await AsyncStorage.setItem(ORIGINAL_KEY, JSON.stringify(sanitized));
-    return true;
-  } catch {
-    return false;
-  }
+  return writeTripRecord(normalizeItinerary(data), ORIGINAL_TRIP_KEY);
 }
 
-export async function loadItinerary(): Promise<Itinerary | null> {
+export async function saveOriginalTripRecord(data: TripRecord): Promise<boolean> {
+  return writeTripRecord(JSON.parse(JSON.stringify(data)) as TripRecord, ORIGINAL_TRIP_KEY);
+}
+
+async function loadTripRecordAt(key: string): Promise<TripRecord | null> {
+  const json = await AsyncStorage.getItem(key);
+  if (!json) return null;
+  const parsed: unknown = JSON.parse(json);
+  if (!isTripRecord(parsed)) throw new Error('Invalid trip record');
+  return parsed;
+}
+
+async function loadOrMigrateTrip(recordKey: string, legacyKey: string): Promise<TripRecord | null> {
+  const stored = await loadTripRecordAt(recordKey);
+  if (stored) return stored;
+  const legacy = await loadLegacyItinerary(legacyKey);
+  if (!legacy) return null;
+  const migrated = normalizeItinerary(legacy);
+  if (!await writeTripRecord(migrated, recordKey)) throw new Error('Could not migrate trip');
+  return migrated;
+}
+
+export async function loadTripRecord(): Promise<TripRecord | null> {
   try {
-    const itinerary = await loadStoredItinerary(ITINERARY_KEY);
+    const trip = await loadOrMigrateTrip(TRIP_KEY, LEGACY_ITINERARY_KEY);
     // A damaged backup must not hide the usable current itinerary.
-    await loadStoredItinerary(ORIGINAL_KEY).catch(() => null);
-    return itinerary;
+    await loadOrMigrateTrip(ORIGINAL_TRIP_KEY, LEGACY_ORIGINAL_KEY).catch(() => null);
+    return trip;
   } catch {
     return null;
   }
 }
 
+export async function loadItinerary(): Promise<Itinerary | null> {
+  const record = await loadTripRecord();
+  return record ? itineraryFromTripRecord(record) : null;
+}
+
 export async function loadOriginalItinerary(): Promise<Itinerary | null> {
   try {
-    return await loadStoredItinerary(ORIGINAL_KEY);
+    const record = await loadOrMigrateTrip(ORIGINAL_TRIP_KEY, LEGACY_ORIGINAL_KEY);
+    return record ? itineraryFromTripRecord(record) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function loadOriginalTripRecord(): Promise<TripRecord | null> {
+  try {
+    return await loadOrMigrateTrip(ORIGINAL_TRIP_KEY, LEGACY_ORIGINAL_KEY);
   } catch {
     return null;
   }
@@ -94,7 +131,12 @@ export async function loadOriginalItinerary(): Promise<Itinerary | null> {
 export async function clearItinerary(): Promise<void> {
   try {
     await itineraryWrites;
-    await AsyncStorage.multiRemove([ITINERARY_KEY, ORIGINAL_KEY]);
+    await AsyncStorage.multiRemove([
+      TRIP_KEY,
+      ORIGINAL_TRIP_KEY,
+      LEGACY_ITINERARY_KEY,
+      LEGACY_ORIGINAL_KEY,
+    ]);
   } catch (e) {
     console.error(e);
   }

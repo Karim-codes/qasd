@@ -28,7 +28,7 @@ export interface Phase {
   steps: Step[];
 }
 
-export function buildSteps(itinerary: Itinerary): { tripType: 'hajj' | 'umrah'; phases: Phase[] } {
+export function buildSteps(itinerary: Itinerary, currentTime = new Date()): { tripType: 'hajj' | 'umrah'; phases: Phase[] } {
   const outbound = itinerary.flights?.outbound;
   const ret = itinerary.flights?.return;
   const hajjDays = deriveHajjDays(itinerary.hajj?.arafahDate);
@@ -48,7 +48,7 @@ export function buildSteps(itinerary: Itinerary): { tripType: 'hajj' | 'umrah'; 
   const makkahHotel = (tripType === 'umrah' && madinahFirst) ? hotel2 : hotel1;
   const madinahHotel = (tripType === 'umrah' && madinahFirst) ? hotel1 : hotel2;
 
-  const sToStatus = getStepStatus;
+  const sToStatus = (startDate?: string, endDate?: string) => getStepStatus(startDate, endDate, currentTime);
 
   const preTrip: Step[] = [
     {

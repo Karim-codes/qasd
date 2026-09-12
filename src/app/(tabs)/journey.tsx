@@ -3,10 +3,11 @@ import { LocalSaveStatus } from '@/components/local-save-status';
 import { QasdFonts } from '@/constants/qasd-theme';
 import { TravelColors as C, TravelType as T } from '@/constants/travel-design';
 import { useItinerary } from '@/context/itinerary-context';
-import { useJourneyProgress } from '@/hooks/use-local-progress';
+import { useGuideProgress, useJourneyProgress, usePreparationChecklist } from '@/hooks/use-local-progress';
 import { useNow } from '@/hooks/use-now';
 import { formatDateShort } from '@/lib/date-helpers';
 import { buildSteps, getNextJourneyStep, type Step, type Phase } from '@/lib/journey';
+import { getNextJourneyAction } from '@/lib/home-action';
 import * as Haptics from 'expo-haptics';
 import { useRouter, type Href } from 'expo-router';
 import { useState } from 'react';
@@ -61,17 +62,20 @@ function JourneyStop({ step, completed, isNext, disabled, onToggle, last }: {
 }
 
 export default function JourneyTab() {
-  const { itinerary } = useItinerary();
+  const { itinerary, trip } = useItinerary();
   const progress = useJourneyProgress();
+  const guide = useGuideProgress();
+  const checklist = usePreparationChecklist();
   const router = useRouter();
   const [selected, setSelected] = useState('all');
-  useNow();
-  if (!itinerary) return null;
-  const { tripType, phases } = buildSteps(itinerary);
+  const now = new Date(useNow());
+  if (!itinerary || !trip) return null;
+  const { tripType, phases } = buildSteps(itinerary, now);
   const steps = phases.flatMap(phase => phase.steps);
   const done = steps.filter(step => progress.value[step.id]).length;
   const next = getNextJourneyStep(steps, progress.value);
-  const nextTarget = next ? destination(next) : null;
+  const action = getNextJourneyAction(trip, { journeyCompleted: progress.value, guide: guide.value, checklist: checklist.value }, now);
+  const actionReady = progress.ready && guide.ready && checklist.ready;
   const finished = progress.ready && done === steps.length;
   const cities = phases.filter(phase => phase.id === 'makkah' || phase.id === 'madinah');
   const visible = selected === 'all' ? phases : phases.filter(phase => phase.id === selected);
@@ -99,8 +103,8 @@ export default function JourneyTab() {
         <View style={s.paperDivider} />
         <View style={s.between}><Text style={s.progressLabel}>{finished ? 'Your journey, remembered.' : 'A little closer with every step.'}</Text><Text style={s.progressCount}>{progress.ready ? `${done}/${steps.length}` : '—'}</Text></View>
         <View style={s.progressTrack}><View style={[s.progressFill, { width: `${progress.ready ? done / Math.max(1, steps.length) * 100 : 0}%` }]} /></View>
-        {next && nextTarget && progress.ready && <TouchableOpacity accessibilityRole="button" onPress={() => router.push(nextTarget!.route)} style={s.nextAction}>
-          <View style={s.flex}><Text style={s.nextActionLabel}>UP NEXT</Text><Text style={s.nextActionTitle}>{next.title}</Text></View><AppIcon name="arrow-forward" size={20} color={C.paper} />
+        {actionReady && <TouchableOpacity accessibilityRole="button" onPress={() => router.push(action.step ? { pathname: '/umrah-guide', params: { step: action.step } } : action.route)} style={s.nextAction}>
+          <View style={s.flex}><Text style={s.nextActionLabel}>{action.eyebrow.toUpperCase()}</Text><Text style={s.nextActionTitle}>{action.title}</Text></View><AppIcon name="arrow-forward" size={20} color={C.paper} />
         </TouchableOpacity>}
       </View>
       {(progress.error || !progress.ready || progress.saving) && <LocalSaveStatus record={progress} />}

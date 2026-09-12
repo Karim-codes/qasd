@@ -10,10 +10,11 @@ export function GuideStepCompletion({ id }: { id: string }) {
   const record = useGuideProgress();
   const journey = useJourneyProgress();
   const done = !!record.value.completed[id];
+  const isCounterStep = id === 'tawaf-start' || id === 'sai-laps';
   const needsLaps = (id === 'tawaf-start' && record.value.counters.tawaf.count < 7)
     || (id === 'sai-laps' && record.value.counters.sai.count < 7);
   const needsSteps = id === 'complete' && UMRAH_STEPS.some(step => step.id !== 'complete' && !record.value.completed[step.id]);
-  const disabled = !record.ready || (!done && (needsLaps || needsSteps));
+  const disabled = !record.ready || isCounterStep || (!done && (needsLaps || needsSteps));
   return <TouchableOpacity
     accessibilityRole="button" accessibilityState={{ disabled }}
     accessibilityLabel={`${UMRAH_STEPS.find(step => step.id === id)?.title}: ${done ? 'completed, undo completion' : 'mark complete'}`}
@@ -27,9 +28,9 @@ export function GuideStepCompletion({ id }: { id: string }) {
     <AppIcon name={done ? 'checkmark-circle' : 'ellipse-outline'} size={22} color={C.paper} />
     <View style={{ flex: 1 }}>
       <Text style={{ color: C.paper, fontFamily: QasdFonts.bodySemiBold, fontSize: 15 }}>
-        {done ? 'Step completed' : needsLaps ? 'Record all 7 to complete this step' : needsSteps ? 'Complete the earlier steps first' : 'Mark step complete'}
+        {isCounterStep && done ? '7 of 7 recorded · Step completed' : done ? 'Step completed' : needsLaps ? 'Record all 7 to complete this step' : needsSteps ? 'Complete the earlier steps first' : 'Mark step complete'}
       </Text>
-      {done && <Text style={{ color: '#c4d2c7', fontFamily: QasdFonts.body, fontSize: 12, marginTop: 3 }}>Tap to undo completion</Text>}
+      {done && <Text style={{ color: '#c4d2c7', fontFamily: QasdFonts.body, fontSize: 12, marginTop: 3 }}>{isCounterStep ? 'Use the counter to undo or reset' : 'Tap to undo completion'}</Text>}
     </View>
     {done && <AppIcon name="arrow-undo-outline" size={19} color={C.paper} />}
   </TouchableOpacity>;

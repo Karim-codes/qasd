@@ -5,7 +5,7 @@ export interface RecordStorage {
   setItem(key: string, value: string): Promise<unknown>;
 }
 
-export function createLocalRecord<T>(storage: RecordStorage, key: string, initial: T, validate: (raw: unknown) => T) {
+export function createLocalRecord<T>(storage: RecordStorage, key: string, initial: T, validate: (raw: unknown) => T, legacyKeys: string[] = []) {
   let snapshot = { value: initial, ready: false, saving: false, error: null as string | null };
   let loading: Promise<void> | null = null;
   let writes = Promise.resolve();
@@ -20,8 +20,17 @@ export function createLocalRecord<T>(storage: RecordStorage, key: string, initia
     if (loading) return loading;
     loading = (async () => {
       try {
-        const raw = await storage.getItem(key);
-        emit({ value: raw === null ? initial : validate(JSON.parse(raw)), ready: true, error: null });
+        let raw = await storage.getItem(key);
+        let migrated = false;
+        if (raw === null) {
+          for (const legacyKey of legacyKeys) {
+            raw = await storage.getItem(legacyKey);
+            if (raw !== null) { migrated = true; break; }
+          }
+        }
+        const value = raw === null ? initial : validate(JSON.parse(raw));
+        if (migrated) await storage.setItem(key, JSON.stringify(value));
+        emit({ value, ready: true, error: null });
       } catch {
         emit({ error: 'Could not load saved progress. Retry before making changes.' });
       } finally {

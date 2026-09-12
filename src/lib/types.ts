@@ -12,6 +12,9 @@ export interface Flight {
   stopoverCity: string;
   layoverDuration: string;
   bookingRef: string;
+  /** IANA time zones. Optional until a route supplies them reliably. */
+  departureTimeZone?: string;
+  arrivalTimeZone?: string;
 }
 
 export interface Hotel {
@@ -30,6 +33,61 @@ export type TripType = 'hajj' | 'umrah';
  * - 'makkah-only'    → Makkah only, no Madinah stay
  */
 export type UmrahRoute = 'makkah-madinah' | 'madinah-makkah' | 'makkah-only';
+
+export type JourneyEventSource = 'qasd' | 'pilgrim' | 'operator';
+
+export interface Pilgrim {
+  id: string;
+  name: string;
+  packageName: string;
+  packageNumber: string;
+  pilgrimType: string;
+}
+
+export interface TripFlight extends Flight {
+  id: string;
+  direction: 'outbound' | 'return' | 'other';
+  source: JourneyEventSource;
+}
+
+export interface TripStay extends Hotel {
+  id: string;
+  kind: 'makkah' | 'madinah' | 'other';
+  source: JourneyEventSource;
+}
+
+export interface JourneyEvent {
+  id: string;
+  type: 'flight' | 'stay' | 'transfer' | 'ritual' | 'custom';
+  title: string;
+  startsAt?: string;
+  timeZone?: string;
+  source: JourneyEventSource;
+  destination?: string;
+}
+
+/** Shared trip facts. Pilgrim-specific completion is stored separately by pilgrim id. */
+export interface Trip {
+  id: string;
+  tripType: TripType;
+  pilgrimIds: string[];
+  primaryPilgrimId: string;
+  flights: TripFlight[];
+  stays: TripStay[];
+  journeyEvents: JourneyEvent[];
+  umrah?: { route: UmrahRoute };
+  hajj?: { arafahDate?: string };
+  guide: { name: string; phone: string };
+  camp: { name: string };
+  transportation: string;
+}
+
+export interface TripRecord {
+  schemaVersion: 2;
+  trip: Trip;
+  pilgrims: Record<string, Pilgrim>;
+  updatedAt: string;
+}
 
 export interface Itinerary {
   /** Stable local identity, preserved when editing trip details. */
