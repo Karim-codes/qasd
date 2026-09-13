@@ -17,6 +17,16 @@ steps:
 
 - bash: |
     set -euo pipefail
+    npm ci --no-audit --no-fund
+  displayName: 'Install JavaScript dependencies'
+
+- bash: |
+    set -euo pipefail
+    npx --no-install expo prebuild --platform ios --clean --no-install
+  displayName: 'Generate iOS project with Expo'
+
+- bash: |
+    set -euo pipefail
 
     sudo xcode-select \
       --switch /Applications/Xcode_16.4.app/Contents/Developer
