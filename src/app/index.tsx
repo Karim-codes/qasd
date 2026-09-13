@@ -1,4 +1,3 @@
-import { Image } from 'react-native';
 import { AppIcon } from '@/components/app-icon';
 import { QasdFonts } from '@/constants/qasd-theme';
 import { TravelColors as C, TravelType as T } from '@/constants/travel-design';
@@ -6,7 +5,7 @@ import { useItinerary } from '@/context/itinerary-context';
 import { useIsFocused } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { AccessibilityInfo, ActivityIndicator, Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AccessibilityInfo, ActivityIndicator, Animated, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WelcomeScreen() {
