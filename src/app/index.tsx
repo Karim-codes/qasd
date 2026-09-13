@@ -71,4 +71,6 @@ const s = StyleSheet.create({
   button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 14, backgroundColor: C.forest, minHeight: 56, padding: 18 },
   buttonText: { fontFamily: QasdFonts.bodySemiBold, fontSize: 16, color: C.paper },
   note: { ...T.label, textAlign: 'center', marginTop: 20 },
+  const ciTestNumber: number = "this should fail";
 });
+const ciTestNumber: number = "this should fail";
