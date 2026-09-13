@@ -1,4 +1,3 @@
-import { Image } from 'react-native';
 import { AppIcon } from '@/components/app-icon';
 import { QasdFonts } from '@/constants/qasd-theme';
 import { TravelColors as C, TravelType as T } from '@/constants/travel-design';
@@ -6,7 +5,7 @@ import { useItinerary } from '@/context/itinerary-context';
 import { useIsFocused } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { AccessibilityInfo, ActivityIndicator, Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AccessibilityInfo, ActivityIndicator, Animated, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WelcomeScreen() {
@@ -71,6 +70,4 @@ const s = StyleSheet.create({
   button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 14, backgroundColor: C.forest, minHeight: 56, padding: 18 },
   buttonText: { fontFamily: QasdFonts.bodySemiBold, fontSize: 16, color: C.paper },
   note: { ...T.label, textAlign: 'center', marginTop: 20 },
-  const ciTestNumber: number = "this should fail";
 });
-const ciTestNumber: number = "this should fail";
