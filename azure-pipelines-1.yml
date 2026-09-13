@@ -1,0 +1,35 @@
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: macOS-15
+
+steps:
+- task: UseNode@1
+  displayName: 'Use Node.js 22'
+  inputs:
+    version: '22.x'
+    checkLatest: false
+
+- bash: |
+    set -euo pipefail
+
+    sudo xcode-select \
+      --switch /Applications/Xcode_16.4.app/Contents/Developer
+
+    echo "Node:"
+    node --version
+
+    echo "npm:"
+    npm --version
+
+    echo "Xcode:"
+    xcodebuild -version
+
+    echo "CocoaPods:"
+    pod --version
+  displayName: 'Verify macOS build toolchain'
