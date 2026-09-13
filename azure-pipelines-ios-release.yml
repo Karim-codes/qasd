@@ -17,6 +17,11 @@ steps:
 
 - bash: |
     set -euo pipefail
+    npm ci --no-audit --no-fund
+  displayName: 'Install JavaScript dependencies'
+
+- bash: |
+    set -euo pipefail
 
     sudo xcode-select \
       --switch /Applications/Xcode_16.4.app/Contents/Developer
