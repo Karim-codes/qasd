@@ -43,11 +43,31 @@ steps:
     echo "Xcode projects:"
     find ios -maxdepth 1 -name "*.xcodeproj" -print
 
-        echo "Xcode workspace details:"
+    echo "Xcode workspace details:"
     xcodebuild \
       -workspace ios/Qasd.xcworkspace \
       -list
   displayName: 'Discover generated Xcode project'
+
+- bash: |
+    set -euo pipefail
+
+    echo "Selecting Xcode 16.4..."
+    sudo xcode-select \
+      --switch /Applications/Xcode_16.4.app/Contents/Developer
+
+    echo "Active Xcode:"
+    xcodebuild -version
+
+    echo "Building Qasd for iOS Simulator..."
+    xcodebuild \
+      -workspace ios/Qasd.xcworkspace \
+      -scheme Qasd \
+      -configuration Release \
+      -sdk iphonesimulator \
+      CODE_SIGNING_ALLOWED=NO \
+      build
+  displayName: 'Build Qasd for iOS Simulator'
 
 - bash: |
     set -euo pipefail
