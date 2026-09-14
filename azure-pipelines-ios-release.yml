@@ -27,6 +27,12 @@ steps:
 
 - bash: |
     set -euo pipefail
+    cd ios
+    pod install
+  displayName: 'Install iOS dependencies with CocoaPods'
+
+- bash: |
+    set -euo pipefail
 
     sudo xcode-select \
       --switch /Applications/Xcode_16.4.app/Contents/Developer
