@@ -42,6 +42,11 @@ steps:
 
     echo "Xcode projects:"
     find ios -maxdepth 1 -name "*.xcodeproj" -print
+
+        echo "Xcode workspace details:"
+    xcodebuild \
+      -workspace ios/Qasd.xcworkspace \
+      -list
   displayName: 'Discover generated Xcode project'
 
 - bash: |
