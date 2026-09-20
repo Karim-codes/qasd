@@ -1,0 +1,27 @@
+trigger: none
+
+pool:
+  name: Qasd-Mac
+
+steps:
+- bash: |
+    set -euo pipefail
+
+    echo "=== QASD SELF-HOSTED MAC TEST ==="
+
+    echo "Hostname:"
+    hostname
+
+    echo "Architecture:"
+    uname -m
+
+    echo "macOS:"
+    sw_vers
+
+    echo "User:"
+    whoami
+
+    echo "Working directory:"
+    pwd
+
+  displayName: 'Verify Qasd self-hosted Mac'
