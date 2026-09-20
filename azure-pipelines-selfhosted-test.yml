@@ -7,8 +7,12 @@ steps:
 - bash: |
     set -euo pipefail
 
-    echo "=== QASD SELF-HOSTED MAC TEST ==="
+    echo "======================================"
+    echo " QASD SELF-HOSTED MAC ENVIRONMENT"
+    echo "======================================"
 
+    echo ""
+    echo "=== MACHINE ==="
     echo "Hostname:"
     hostname
 
@@ -24,4 +28,47 @@ steps:
     echo "Working directory:"
     pwd
 
-  displayName: 'Verify Qasd self-hosted Mac'
+    echo ""
+    echo "=== PATH ==="
+    echo "$PATH"
+
+    echo ""
+    echo "=== NODE ==="
+    which node || true
+    node --version || true
+
+    echo ""
+    echo "=== NPM ==="
+    which npm || true
+    npm --version || true
+
+    echo ""
+    echo "=== XCODE ==="
+    xcode-select -p || true
+    xcodebuild -version || true
+
+    echo ""
+    echo "=== COCOAPODS ==="
+    which pod || true
+    pod --version || true
+
+    echo ""
+    echo "=== RUBY ==="
+    which ruby || true
+    ruby --version || true
+
+    echo ""
+    echo "=== NPX ==="
+    which npx || true
+    npx --version || true
+
+    echo ""
+    echo "=== DISK SPACE ==="
+    df -h /
+
+    echo ""
+    echo "======================================"
+    echo " ENVIRONMENT CHECK COMPLETE"
+    echo "======================================"
+
+  displayName: 'Inspect Qasd self-hosted build environment'
