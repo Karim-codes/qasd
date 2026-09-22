@@ -6,7 +6,7 @@ pr:
       - main
 
 pool:
-  vmImage: macOS-15
+  name: Qasd-Mac
 
 steps:
 - task: UseNode@1
@@ -17,25 +17,6 @@ steps:
 
 - bash: |
     set -euo pipefail
-    npm ci --no-audit --no-fund
-  displayName: 'Install JavaScript dependencies'
-
-- bash: |
-    set -euo pipefail
-    npx --no-install expo prebuild --platform ios --clean --no-install
-  displayName: 'Generate iOS project with Expo'
-
-- bash: |
-    set -euo pipefail
-    cd ios
-    pod install
-  displayName: 'Install iOS dependencies with CocoaPods'
-
-- bash: |
-    set -euo pipefail
-
-    sudo xcode-select \
-      --switch /Applications/Xcode_16.4.app/Contents/Developer
 
     echo "Node:"
     node --version
@@ -43,9 +24,69 @@ steps:
     echo "npm:"
     npm --version
 
+    echo "Architecture:"
+    uname -m
+
     echo "Xcode:"
     xcodebuild -version
 
+    echo "Xcode developer directory:"
+    xcode-select -p
+
     echo "CocoaPods:"
     pod --version
-  displayName: 'Verify macOS build toolchain'
+
+  displayName: 'Verify self-hosted Mac build toolchain'
+
+- bash: |
+    set -euo pipefail
+    npm ci --no-audit --no-fund
+
+  displayName: 'Install JavaScript dependencies'
+
+- bash: |
+    set -euo pipefail
+    npx --no-install expo prebuild --platform ios --clean --no-install
+
+  displayName: 'Generate iOS project with Expo'
+
+- bash: |
+    set -euo pipefail
+    cd ios
+    pod install
+
+  displayName: 'Install iOS dependencies with CocoaPods'
+
+- bash: |
+    set -euo pipefail
+
+    echo "Generated iOS files:"
+    find ios -maxdepth 1 -type d -print
+
+    echo "Xcode workspaces:"
+    find ios -maxdepth 1 -name "*.xcworkspace" -print
+
+    echo "Xcode projects:"
+    find ios -maxdepth 1 -name "*.xcodeproj" -print
+
+    echo "Xcode workspace details:"
+    xcodebuild \
+      -workspace ios/Qasd.xcworkspace \
+      -list
+
+  displayName: 'Discover generated Xcode project'
+
+- bash: |
+    set -euo pipefail
+
+    echo "Building Qasd for iOS Simulator..."
+
+    xcodebuild \
+      -workspace ios/Qasd.xcworkspace \
+      -scheme Qasd \
+      -configuration Release \
+      -sdk iphonesimulator \
+      CODE_SIGNING_ALLOWED=NO \
+      build
+
+  displayName: 'Build Qasd for iOS Simulator'
