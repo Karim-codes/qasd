@@ -165,10 +165,7 @@ const s = StyleSheet.create({
     marginBottom: 22,
   },
   heroIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: '#ded5c1',
+    alignSelf: 'flex-start',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,

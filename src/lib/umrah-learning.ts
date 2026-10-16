@@ -13,12 +13,15 @@ export function learningTitle(step: UmrahStep) {
   return step.id === 'complete' ? 'Completing Umrah' : step.title;
 }
 
-export function learningResumeIndex(progress: LearningProgress) {
-  const reviewed = UMRAH_STEPS.filter(step => progress.reviewed[step.id]).length;
-  const firstUnread = UMRAH_STEPS.findIndex(step => !progress.reviewed[step.id]);
-  // Browsing to the end alone should not skip the start of a new learning journey.
-  if (reviewed === 0) return 0;
-  const last = UMRAH_STEPS.findIndex(step => step.id === progress.lastStep);
-  if (last >= 0 && (!progress.reviewed[progress.lastStep] || firstUnread === -1)) return last;
-  return Math.max(0, firstUnread);
+// Continue learning follows ritual order, regardless of browsing history.
+// null means every topic has been reviewed; there is no next unreviewed topic.
+export function nextLearningIndex(progress: LearningProgress): number | null {
+  const index = UMRAH_STEPS.findIndex(step => !progress.reviewed[step.id]);
+  return index === -1 ? null : index;
+}
+
+// Resume reading returns exactly the last-opened topic, even if already reviewed.
+export function learningResumeIndex(progress: LearningProgress): number | null {
+  const index = UMRAH_STEPS.findIndex(step => step.id === progress.lastStep);
+  return index === -1 ? null : index;
 }

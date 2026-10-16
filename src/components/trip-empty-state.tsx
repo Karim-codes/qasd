@@ -13,10 +13,11 @@ export function TripEmptyState({ flights = false }: { flights?: boolean }) {
       <Text style={s.title}>{flights ? 'Your flights' : 'Your journey'}</Text>
       <View style={s.card}>
         <AppIcon name={flights ? 'airplane-outline' : 'map-outline'} size={30} color="#263c36" />
-        <Text style={s.cardTitle}>Your trip can come later.</Text>
+        <Text style={s.cardTitle}>{flights ? 'No flights added yet.' : 'Your trip can come later.'}</Text>
         <Text style={s.body}>{flights ? 'Keep your flight details here when you have them.' : 'Bring your route, stays and travel dates together when you’re ready.'} You can explore the guide and prepare anytime.</Text>
         <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/umrah-setup/destination')} style={s.button}><Text style={s.buttonText}>Add a trip</Text><AppIcon name="arrow-forward" size={21} color="#fffaf0" /></TouchableOpacity>
       </View>
+      <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/checklist')} style={s.guide}><AppIcon name="checkmark-done-outline" size={20} color={Palette.gold} /><Text style={s.link}>Start preparing</Text><AppIcon name="arrow-forward" size={19} color={Palette.gold} /></TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.navigate('/(tabs)/guide')} style={s.guide}><Text style={s.link}>Explore the Umrah guide</Text><AppIcon name="arrow-forward" size={19} color={Palette.gold} /></TouchableOpacity>
     </ScrollView>
   </SafeAreaView>;

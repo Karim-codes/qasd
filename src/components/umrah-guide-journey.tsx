@@ -67,7 +67,7 @@ function RitualRoute({ activeIdx, completed, onStep, learning }: {
 const r = StyleSheet.create({
   canvas: { backgroundColor: '#dce3d3', borderRadius: 26, overflow: 'hidden' },
   chapter: { position: 'absolute', left: 18, right: 18, flexDirection: 'row', alignItems: 'center', gap: 13, backgroundColor: '#dce3d3', paddingVertical: 8 },
-  chapterGlyph: { width: 56, height: 56, backgroundColor: '#cad5be', borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  chapterGlyph: { alignItems: 'center', justifyContent: 'center' },
   eyebrow: { fontFamily: F.bodySemiBold, fontSize: 9, letterSpacing: 1.1, color: '#56644d' },
   chapterTitle: { fontFamily: F.displayMedium, fontSize: 28, color: C.ink, marginTop: 4 },
   stop: { position: 'absolute', width: 58, height: 58, borderRadius: 29, backgroundColor: C.paper, borderWidth: 4, borderColor: '#b6c2a8', alignItems: 'center', justifyContent: 'center' },
@@ -97,7 +97,7 @@ export function GuideJourney({ mode, activeIdx, onStep, learning = false, embedd
     const completed = !!completedSteps[step.id];
     const selected = index === activeIdx && !!lastStep;
     return <TouchableOpacity key={step.id} accessibilityRole="button" accessibilityLabel={`${index + 1}. ${step.title}${completed ? learning ? ', reviewed' : ', completed' : ''}`} onPress={() => onStep(step, index)} style={[s.step, selected && s.selected]} activeOpacity={0.75}>
-      <View style={[s.number, completed && s.numberDone]}>{completed ? <AppIcon name="checkmark" size={18} color={C.paper} /> : <Text style={s.numberText}>{String(index + 1).padStart(2, '0')}</Text>}</View>
+      <View style={s.number}>{completed ? <AppIcon name="checkmark" size={18} color={C.gold} /> : <Text style={s.numberText}>{String(index + 1).padStart(2, '0')}</Text>}</View>
       <View style={{ flex: 1 }}>
         <Text style={s.stepTitle}>{step.title}</Text>
         <Text style={s.caption}>{completed ? learning ? 'Reviewed' : 'Completed' : step.laps ? learning ? 'Guidance & practice counter' : 'Guidance & lap counter' : step.dua ? 'Guidance & du’a' : step.phase}</Text>
@@ -143,7 +143,7 @@ export function GuideJourney({ mode, activeIdx, onStep, learning = false, embedd
 const s = StyleSheet.create({
   sectionTitle: { fontFamily: F.bodySemiBold, fontSize: 21, lineHeight: 28, color: C.cream },
   routeResume: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 21, backgroundColor: C.paper },
-  routeResumeIcon: { width: 42, height: 48, borderRadius: 15, backgroundColor: '#dbe0d1', alignItems: 'center', justifyContent: 'center' },
+  routeResumeIcon: { alignItems: 'center', justifyContent: 'center' },
   routeResumeTitle: { fontFamily: F.bodySemiBold, fontSize: 21, color: C.ink, marginVertical: 4 },
   hero: { backgroundColor: C.paper, padding: 22, borderRadius: 26 },
   spread: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
@@ -160,15 +160,14 @@ const s = StyleSheet.create({
   chapterNo: { fontFamily: F.body, fontSize: 12, color: C.gold },
   groupTitle: { fontFamily: F.bodySemiBold, fontSize: 20, color: C.paper },
   rule: { flex: 1, height: 1, backgroundColor: C.line },
-  step: { flexDirection: 'row', alignItems: 'center', gap: 13, backgroundColor: C.surface, borderRadius: 19, padding: 16, marginBottom: 8, borderWidth: 1, borderColor: C.line },
-  selected: { borderColor: '#7f927e' },
-  number: { width: 38, height: 42, borderRadius: 13, backgroundColor: C.iconSurface, justifyContent: 'center', alignItems: 'center' },
-  numberDone: { backgroundColor: C.forest },
+  step: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.line },
+  selected: { borderBottomColor: '#7f927e' },
+  number: { width: 24, justifyContent: 'center', alignItems: 'center' },
   numberText: { fontFamily: F.bodyMedium, fontSize: 12, color: C.gold },
-  stepTitle: { fontFamily: F.bodyMedium, fontSize: 16, color: C.cream },
-  caption: { fontFamily: F.body, fontSize: 12, color: C.muted, marginTop: 4 },
+  stepTitle: { fontFamily: F.bodyMedium, fontSize: 15, lineHeight: 21, color: C.cream },
+  caption: { fontFamily: F.body, fontSize: 12, color: C.muted, marginTop: 2 },
   chapterTabs: { flexDirection: 'row', gap: 8, marginVertical: 20 },
-  chapterTab: { flex: 1, alignItems: 'center', gap: 7, paddingVertical: 14, backgroundColor: C.surface, borderRadius: 18 },
+  chapterTab: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 5, minHeight: 48, paddingVertical: 6 },
   tabText: { fontFamily: F.bodyMedium, fontSize: 11, color: C.muted },
   blessing: { fontFamily: F.displayMedium, fontSize: 22, textAlign: 'center', color: C.muted, lineHeight: 28, marginTop: 30 },
 });

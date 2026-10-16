@@ -112,10 +112,6 @@ const s = StyleSheet.create({
     marginBottom: 12,
   },
   iconBubble: {
-    width: 30,
-    height: 30,
-    borderRadius: 10,
-    backgroundColor: Palette.goldMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },

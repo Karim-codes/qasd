@@ -17,7 +17,7 @@ export function Section({
   return (
     <View style={s.section}>
       <View style={s.sectionHead}>
-        <View style={[s.sectionIcon, { backgroundColor: tint + '22' }]}>
+        <View style={s.sectionIcon}>
           <Ionicons name={icon} size={21} color={tint} />
         </View>
         <Text style={s.sectionTitle}>{title}</Text>
@@ -80,9 +80,6 @@ const s = StyleSheet.create({
     marginBottom: 12,
   },
   sectionIcon: {
-    width: 40,
-    height: 44,
-    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,

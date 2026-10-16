@@ -55,27 +55,25 @@ export default function UmrahGuideScreen({ embedded = false }: { embedded?: bool
       {!embedded && <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} style={s.back}><AppIcon name="chevron-back" size={23} color={C.cream} /></TouchableOpacity>}
       <Text accessibilityRole="header" style={s.title}>Umrah guide</Text>
       <Text accessibilityLanguage="ar" style={s.arabic}>ٱلْعُمْرَة</Text>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel={showSaved ? 'Show all guidance' : `Show saved du’as, ${savedSteps.length} saved`} accessibilityState={{ selected: showSaved }} onPress={() => setShowSaved(value => !value)} style={s.saved}>
+        <AppIcon name={showSaved ? 'bookmark' : 'bookmark-outline'} size={20} color={showSaved ? C.gold : C.cream} />
+        {savedSteps.length > 0 && <Text style={s.savedCount}>{savedSteps.length}</Text>}
+      </TouchableOpacity>
     </View>
 
     <View style={s.modes} accessibilityRole="tablist">
       {(['learn', 'perform'] as const).map(mode => <TouchableOpacity key={mode} accessibilityRole="tab" accessibilityState={{ selected: guideMode === mode }} onPress={() => changeMode(mode)} style={[s.mode, guideMode === mode && s.modeSelected]}>
-        <AppIcon name={mode === 'learn' ? 'book-outline' : 'compass-outline'} size={17} color={guideMode === mode ? C.paper : C.muted} />
         <Text style={[s.modeText, guideMode === mode && { color: C.paper }]}>{mode === 'learn' ? 'Learn' : 'Perform'}</Text>
       </TouchableOpacity>)}
     </View>
-    <Text style={s.hint}>{isLearning ? 'Understand the journey. One topic at a time.' : 'Guidance and counters for performing your Umrah.'}</Text>
-
-    <View style={s.toolbar}>
-      {isLearning ? <View style={s.learningLabel}><AppIcon name="book-outline" size={16} color={C.gold} /><Text style={s.learningLabelText}>{showSaved ? 'Your saved reading' : 'Your learning guide'}</Text></View> : <View style={s.views} accessibilityRole="tablist">
+    {!isLearning && !showSaved && <View style={s.toolbar}>
+      <View style={s.views} accessibilityRole="tablist">
         {(['linear', 'roadmap'] as const).map(mode => <TouchableOpacity key={mode} accessibilityRole="tab" accessibilityState={{ selected: viewMode === mode && !showSaved }} onPress={() => { setViewMode(mode); setShowSaved(false); }} style={[s.view, viewMode === mode && !showSaved && s.viewSelected]}>
-          <AppIcon name={mode === 'linear' ? 'list-outline' : 'map-outline'} size={15} color={viewMode === mode && !showSaved ? C.ink : C.muted} />
-          <Text style={[s.viewText, viewMode === mode && !showSaved && { color: C.ink }]}>{mode === 'linear' ? 'Timeline' : 'Road Map'}</Text>
+          <AppIcon name={mode === 'linear' ? 'list-outline' : 'map-outline'} size={15} color={viewMode === mode && !showSaved ? C.cream : C.muted} />
+          <Text style={[s.viewText, viewMode === mode && !showSaved && { color: C.cream }]}>{mode === 'linear' ? 'Timeline' : 'Road Map'}</Text>
         </TouchableOpacity>)}
-      </View>}
-      <TouchableOpacity accessibilityRole="button" accessibilityLabel={showSaved ? 'Show all guidance' : `Show saved du’as, ${savedSteps.length} saved`} accessibilityState={{ selected: showSaved }} onPress={() => setShowSaved(value => !value)} style={[s.saved, showSaved && s.savedSelected]}>
-        <AppIcon name={showSaved ? 'bookmark' : 'bookmark-outline'} size={18} color={showSaved ? C.gold : C.cream} /><Text style={s.savedCount}>{savedSteps.length}</Text>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </View>}
     {(!progress.ready || progress.error || progress.saving) && <View style={s.status}><LocalSaveStatus record={progress} /></View>}
 
     {showSaved ? <ScrollView contentContainerStyle={[s.savedContent, { paddingBottom: contentInset }]}>
@@ -101,20 +99,16 @@ const s = StyleSheet.create({
   back: { width: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center', marginLeft: -10 },
   title: { flex: 1, fontFamily: F.bodySemiBold, fontSize: 26, lineHeight: 34, color: C.cream, letterSpacing: -0.4 },
   arabic: { fontSize: 22, lineHeight: 34, color: C.gold },
-  modes: { flexDirection: 'row', marginHorizontal: 22, padding: 4, gap: 4, backgroundColor: C.surface, borderRadius: 15 },
+  modes: { flexDirection: 'row', marginHorizontal: 22, padding: 4, gap: 4, marginBottom: 4, backgroundColor: C.surface, borderRadius: 15 },
   mode: { flex: 1, minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 11 },
   modeSelected: { backgroundColor: C.forest },
   modeText: { fontFamily: F.bodySemiBold, fontSize: 15, color: C.muted },
-  hint: { fontFamily: F.body, fontSize: 13, lineHeight: 20, color: C.muted, marginHorizontal: 22, marginTop: 10, marginBottom: 18 },
-  toolbar: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 22, marginBottom: 12 },
-  learningLabel: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  learningLabelText: { fontFamily: F.bodyMedium, fontSize: 13, color: C.muted },
-  views: { flex: 1, flexDirection: 'row', backgroundColor: C.surface, borderRadius: 12, padding: 3 },
+  toolbar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 22 },
+  views: { flex: 1, flexDirection: 'row', gap: 16 },
   view: { flex: 1, minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: 9, paddingHorizontal: 6 },
-  viewSelected: { backgroundColor: C.paper },
+  viewSelected: { borderBottomWidth: 2, borderBottomColor: C.gold },
   viewText: { fontFamily: F.bodyMedium, fontSize: 12, color: C.muted },
-  saved: { minWidth: 52, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, borderRadius: 12, borderWidth: 1, borderColor: C.line },
-  savedSelected: { backgroundColor: C.surface, borderColor: '#776447' },
+  saved: { minWidth: 44, minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5 },
   savedCount: { fontFamily: F.bodyMedium, fontSize: 12, color: C.cream },
   status: { paddingHorizontal: 22 },
   savedContent: { padding: 22 },

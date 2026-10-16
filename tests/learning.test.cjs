@@ -9,20 +9,38 @@ const { carryPreparationToTrip } = require('../src/lib/preparation-storage.ts');
 const { EMPTY_ITINERARY } = require('../src/lib/sample-data.ts');
 const { UMRAH_STEPS } = require('../src/lib/umrah-steps.ts');
 const { getHomeAction } = require('../src/lib/home-action.ts');
-const { learningResumeIndex, learningTitle, UMRAH_CHAPTERS } = require('../src/lib/umrah-learning.ts');
+const { learningResumeIndex, nextLearningIndex, learningTitle, UMRAH_CHAPTERS } = require('../src/lib/umrah-learning.ts');
 
 test('a new learner starts at Ihram even after browsing the final topic', () => {
-  assert.equal(learningResumeIndex({ reviewed: {}, lastStep: 'complete' }), 0);
+  assert.equal(nextLearningIndex({ reviewed: {}, lastStep: 'complete' }), 0);
+  assert.equal(learningResumeIndex({ reviewed: {}, lastStep: 'complete' }), 11);
   assert.equal(learningTitle(UMRAH_STEPS.at(-1)), 'Completing Umrah');
 });
 
-test('learning resumes an unreviewed topic and recovers from stale or fully reviewed positions', () => {
+test('resume reading uses browsing history, while continuation uses the first unreviewed topic', () => {
   assert.equal(learningResumeIndex({ reviewed: { ihram: true }, lastStep: 'sai-start' }), 8);
-  assert.equal(learningResumeIndex({ reviewed: { ihram: true }, lastStep: 'ihram' }), 1);
-  assert.equal(learningResumeIndex({ reviewed: { ihram: true }, lastStep: 'removed-topic' }), 1);
+  assert.equal(nextLearningIndex({ reviewed: { ihram: true }, lastStep: 'sai-start' }), 1);
+  assert.equal(learningResumeIndex({ reviewed: { ihram: true }, lastStep: 'ihram' }), 0);
+  assert.equal(learningResumeIndex({ reviewed: { ihram: true }, lastStep: 'removed-topic' }), null);
+  assert.equal(nextLearningIndex({ reviewed: { ihram: true }, lastStep: 'removed-topic' }), 1);
   const reviewed = Object.fromEntries(UMRAH_STEPS.map(step => [step.id, true]));
   assert.equal(learningResumeIndex({ reviewed, lastStep: 'complete' }), 11);
-  assert.equal(learningResumeIndex({ reviewed, lastStep: 'removed-topic' }), 0);
+  assert.equal(learningResumeIndex({ reviewed, lastStep: 'removed-topic' }), null);
+  assert.equal(nextLearningIndex({ reviewed, lastStep: 'complete' }), null);
+});
+
+test('three reviewed topics never recommend the last chapter as the next learning topic', () => {
+  const progress = { reviewed: { ihram: true, 'enter-masjid': true, 'first-sight': true }, lastStep: 'complete' };
+  assert.equal(learningResumeIndex(progress), 11);
+  assert.equal(nextLearningIndex(progress), 3);
+  progress.reviewed['tawaf-start'] = true;
+  assert.equal(nextLearningIndex(progress), 4);
+});
+
+test('unknown review IDs and unreviewed holes do not skip required learning positions', () => {
+  assert.equal(nextLearningIndex({ reviewed: { 'old-topic': true, complete: true }, lastStep: '' }), 0);
+  assert.equal(learningResumeIndex(EMPTY_LEARNING), null);
+  assert.equal(nextLearningIndex(EMPTY_LEARNING), 0);
 });
 
 test('the simplified overview covers every existing topic once, in ritual order', () => {

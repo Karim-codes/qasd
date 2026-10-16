@@ -7,6 +7,7 @@ import { AppIcon as Ionicons } from '@/components/app-icon';
 import { Palette, QasdFonts } from '@/constants/qasd-theme';
 import { TravelType } from '@/constants/travel-design';
 import { useItinerary } from '@/context/itinerary-context';
+import { useTabContentInset } from '@/hooks/use-tab-content-inset';
 import type { Itinerary } from '@/lib/types';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
@@ -139,7 +140,7 @@ function EditorSection({
           <Text style={editorStyles.title}>{title}</Text>
           {subtitle ? <Text style={editorStyles.subtitle}>{subtitle}</Text> : null}
         </View>
-        <View style={[editorStyles.chevron, open && editorStyles.chevronOpen]}>
+        <View style={editorStyles.chevron}>
           <Ionicons
             name={open ? 'chevron-up' : 'chevron-down'}
             size={16}
@@ -182,7 +183,7 @@ function SettingsRow({
 }) {
   const content = (
     <>
-      <View style={[styles.rowIcon, destructive && styles.rowIconDanger]}>
+      <View style={styles.rowIcon}>
         <Ionicons
           name={icon}
           size={18}
@@ -259,7 +260,8 @@ function InfoSheet({
   );
 }
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ embedded = false }: { embedded?: boolean }) {
+  const contentInset = useTabContentInset();
   const router = useRouter();
   const { itinerary, setItinerary, clear } = useItinerary();
   const [draft, setDraft] = useState<Itinerary | null>(() =>
@@ -403,10 +405,10 @@ export default function SettingsScreen() {
   if (!draft) {
     return <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={leaveSettings} hitSlop={10} style={styles.backButton}><Ionicons name="chevron-back" size={25} color={Palette.textPrimary} /></TouchableOpacity>
+        {!embedded && <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={leaveSettings} hitSlop={10} style={styles.backButton}><Ionicons name="chevron-back" size={25} color={Palette.textPrimary} /></TouchableOpacity>}
         <Text style={[styles.headerTitle, { fontFamily: QasdFonts.bodySemiBold, fontSize: 24 }]}>Settings</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: contentInset }]}>
         <Text style={{ fontFamily: QasdFonts.body, color: Palette.textSecondary, fontSize: 16, lineHeight: 24, marginBottom: 24 }}>Your learning, practice and checklist are saved on this device. Add a trip whenever you’re ready.</Text>
         <SettingsCard title="Your journey">
           <SettingsRow icon="airplane-outline" title="Plan your Umrah" subtitle="Set up your Umrah journey" onPress={() => router.push('/umrah-setup/destination')} />
@@ -428,9 +430,9 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} hitSlop={10} style={styles.backButton}>
+        {!embedded && <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} hitSlop={10} style={styles.backButton}>
           <Ionicons name="chevron-back" size={25} color={Palette.textPrimary} />
-        </TouchableOpacity>
+        </TouchableOpacity>}
         <Text style={styles.headerTitle}>Settings</Text>
       </View>
 
@@ -440,7 +442,7 @@ export default function SettingsScreen() {
       >
         <ScrollView
           style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: contentInset }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -760,11 +762,8 @@ const styles = StyleSheet.create({
   backButton: {
     width: 38,
     height: 38,
-    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#2a3341',
   },
   headerTitle: { ...TravelType.section, fontSize: 27, lineHeight: 33 },
   scroll: { flex: 1 },
@@ -816,14 +815,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   rowIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#252e39',
   },
-  rowIconDanger: { backgroundColor: Palette.redMuted },
   rowCopy: { flex: 1, minWidth: 0, marginLeft: 11 },
   rowTitle: {
     fontFamily: QasdFonts.bodySemiBold,
@@ -847,7 +841,7 @@ const styles = StyleSheet.create({
   settingsDivider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.055)',
-    marginLeft: 63,
+    marginLeft: 42,
   },
   journeyHeading: {
     flexDirection: 'row',
@@ -1001,14 +995,8 @@ const styles = StyleSheet.create({
     borderBottomColor: Palette.border,
   },
   infoIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(201,168,76,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.18)',
   },
   infoHeaderCopy: { flex: 1, marginLeft: 12 },
   infoEyebrow: {
@@ -1026,10 +1014,8 @@ const styles = StyleSheet.create({
   closeButton: {
     width: 34,
     height: 34,
-    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
   },
   infoBody: {
     paddingHorizontal: 20,
@@ -1068,14 +1054,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   emptyIcon: {
-    width: 66,
-    height: 66,
-    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Palette.goldMuted,
-    borderWidth: 1,
-    borderColor: Palette.goldBorder,
   },
   emptyTitle: {
     fontFamily: QasdFonts.display,
@@ -1124,12 +1104,8 @@ const editorStyles = StyleSheet.create({
     paddingVertical: 11,
   },
   iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#252e39',
   },
   headerCopy: { flex: 1, minWidth: 0, marginLeft: 11 },
   title: {
@@ -1144,14 +1120,9 @@ const editorStyles = StyleSheet.create({
     marginTop: 2,
   },
   chevron: {
-    width: 30,
-    height: 30,
-    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.025)',
   },
-  chevronOpen: { backgroundColor: 'rgba(201,168,76,0.08)' },
   body: {
     paddingHorizontal: 14,
     paddingBottom: 16,

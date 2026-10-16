@@ -81,6 +81,7 @@ export default function RootLayout() {
             <Stack.Screen name="umrah-guide" options={{ presentation: 'card' }} />
             <Stack.Screen name="umrah-overview" options={{ presentation: 'card', animation: reduceMotion ? 'none' : 'default', gestureEnabled: true }} />
             <Stack.Screen name="umrah-topic" options={{ presentation: 'card', animation: reduceMotion ? 'none' : 'default', gestureEnabled: true }} />
+            <Stack.Screen name="official-umrah-guide" options={{ presentation: 'card', animation: reduceMotion ? 'none' : 'default' }} />
             <Stack.Screen name="stays" options={{ presentation: 'card' }} />
             <Stack.Screen name="checklist" options={{ presentation: 'card' }} />
             <Stack.Screen name="settings" options={{ presentation: 'card' }} />

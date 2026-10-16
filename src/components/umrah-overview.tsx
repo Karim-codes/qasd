@@ -62,7 +62,7 @@ const s = StyleSheet.create({
   learningNoteText: { flex: 1, fontFamily: F.body, fontSize: 12, lineHeight: 19, color: C.muted },
   chapter: { padding: 20, borderRadius: 22, backgroundColor: C.paper, marginBottom: 16 },
   chapterHeader: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  chapterIcon: { width: 50, height: 52, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: '#dbdfd1' },
+  chapterIcon: { alignItems: 'center', justifyContent: 'center' },
   chapterTitle: { fontFamily: F.bodySemiBold, fontSize: 23, lineHeight: 30, color: C.ink, marginTop: 4 },
   chapterDescription: { fontFamily: F.body, fontSize: 14, lineHeight: 22, color: C.paperMuted, marginTop: 14, marginBottom: 12 },
   topic: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 53, paddingVertical: 13, borderTopWidth: 1, borderTopColor: '#d5cebf' },

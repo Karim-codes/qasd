@@ -85,7 +85,7 @@ const s = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 24 },
   headerCopy: { flex: 1 },
   back: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', marginLeft: -10 },
-  headerIcon: { width: 48, height: 48, borderRadius: 17, borderWidth: 1, borderColor: C.line, justifyContent: 'center', alignItems: 'center' },
+  headerIcon: { justifyContent: 'center', alignItems: 'center' },
   progressCard: { padding: 22, borderRadius: 22, backgroundColor: C.paper },
   progressLabel: { ...T.eyebrow, color: C.paperMuted },
   progressTitle: { fontFamily: QasdFonts.displayMedium, fontSize: 35, color: C.ink, marginTop: 10 },

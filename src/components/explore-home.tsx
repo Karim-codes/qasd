@@ -6,7 +6,7 @@ import { RitualIcon } from '@/components/ritual-glyph';
 import { Palette, QasdFonts as F } from '@/constants/qasd-theme';
 import { useGuideProgress, useLearningProgress } from '@/hooks/use-local-progress';
 import { UMRAH_STEPS } from '@/lib/umrah-steps';
-import { learningResumeIndex, learningTitle } from '@/lib/umrah-learning';
+import { learningResumeIndex, nextLearningIndex, learningTitle } from '@/lib/umrah-learning';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,22 +17,20 @@ export function ExploreHome() {
   const learning = useLearningProgress();
   const ritual = useGuideProgress();
   const reviewed = UMRAH_STEPS.filter(step => learning.value.reviewed[step.id]).length;
-  const lastStep = UMRAH_STEPS.find(step => step.id === learning.value.lastStep);
+  const next = nextLearningIndex(learning.value);
+  const resume = learningResumeIndex(learning.value);
   const active = (['tawaf', 'sai'] as const)
     .map(id => ({ id, ...ritual.value.counters[id] }))
     .filter(counter => counter.count > 0 && counter.count < 7)
     .sort((a, b) => b.changedAt - a.changedAt)[0];
   const hasRitual = ritual.ready && !!active;
-  const started = learning.ready && !!lastStep;
-  const openGuide = () => router.push({ pathname: '/(tabs)/guide', params: { mode: 'learn', ...(reviewed > 0 ? { step: UMRAH_STEPS[learningResumeIndex(learning.value)].id } : { step: undefined }) } });
+  const started = learning.ready && (reviewed > 0 || resume !== null);
+  const openGuide = () => router.push({ pathname: '/(tabs)/guide', params: { mode: 'learn', step: started && next !== null ? UMRAH_STEPS[next].id : undefined } });
 
   return <SafeAreaView style={s.container} edges={['top']}>
     <ScrollView contentContainerStyle={[s.content, { paddingBottom: contentInset }]} showsVerticalScrollIndicator={false}>
       <View style={s.header}>
         <Text style={s.brand}>Qasd</Text>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open settings" onPress={() => router.push('/settings')} style={s.settings}>
-          <AppIcon name="settings-outline" size={22} color={Palette.textPrimary} />
-        </TouchableOpacity>
       </View>
       <Text style={s.welcome}>As-salamu alaykum</Text>
       <Text style={s.heading}>Prepare for your Umrah</Text>
@@ -50,10 +48,13 @@ export function ExploreHome() {
         <Text style={s.cardTitle}>{started ? 'A little more confidence.' : 'Understand your Umrah.'}</Text>
         <Text style={s.cardBody}>Clear guidance, du’as and a chance to practise before you travel.</Text>
         <View style={s.sequence}><Text style={s.sequenceText}>Ihram</Text><AppIcon name="chevron-forward" size={12} color="#716044" /><Text style={s.sequenceText}>Tawaf</Text><AppIcon name="chevron-forward" size={12} color="#716044" /><Text style={s.sequenceText}>Sa’i</Text><AppIcon name="chevron-forward" size={12} color="#716044" /><Text style={s.sequenceText}>Finish</Text></View>
-        {started && <Text style={s.progress}>{reviewed} of {UMRAH_STEPS.length} topics reviewed · {learningTitle(UMRAH_STEPS[learningResumeIndex(learning.value)])}</Text>}
+        {started && <Text style={s.progress}>{reviewed} of {UMRAH_STEPS.length} topics reviewed{next === null ? '\nAll topics reviewed' : `\nNext unreviewed: ${learningTitle(UMRAH_STEPS[next])}`}</Text>}
         <TouchableOpacity accessibilityRole="button" onPress={openGuide} style={s.primary}>
-          <Text style={s.primaryText}>{started ? 'Continue learning' : 'Explore the Umrah guide'}</Text><AppIcon name="arrow-forward" size={21} color="#fffaf0" />
+          <Text style={s.primaryText}>{started ? next === null ? 'Revisit topics' : 'Continue learning' : 'Explore the Umrah guide'}</Text><AppIcon name="arrow-forward" size={21} color="#fffaf0" />
         </TouchableOpacity>
+        {learning.ready && resume !== null && resume !== next && <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Resume reading: ${learningTitle(UMRAH_STEPS[resume])}`} onPress={() => router.push({ pathname: '/umrah-topic', params: { mode: 'learn', step: UMRAH_STEPS[resume].id } })} style={s.resume}>
+          <View style={{ flex: 1 }}><Text style={s.resumeTitle}>Resume reading</Text><Text style={s.resumeTopic}>{learningTitle(UMRAH_STEPS[resume])}</Text></View><AppIcon name="arrow-forward" size={18} color="#263c36" />
+        </TouchableOpacity>}
         <Text style={s.offline}>Available offline · No booking needed</Text>
       </View>}
       {(learning.error || learning.saving) && <LocalSaveStatus record={learning} />}
@@ -62,11 +63,10 @@ export function ExploreHome() {
       <PreparationRow />
 
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/umrah-setup/destination')} style={s.plan}>
-        <View style={s.planIcon}><AppIcon name="airplane-outline" size={23} color={Palette.gold} /></View>
-        <View style={{ flex: 1, minWidth: 0 }}><Text style={s.planTitle}>Travelling soon?</Text><Text style={s.planBody}>Add your trip whenever you’re ready.</Text><Text style={s.planLink}>Add a trip</Text></View>
-        <AppIcon name="arrow-forward" size={20} color={Palette.gold} />
+        <AppIcon name="airplane-outline" size={22} color={Palette.gold} />
+        <View style={{ flex: 1, minWidth: 0 }}><Text style={s.planTitle}>Add a trip</Text><Text style={s.planBody}>Flights, stays and travel dates</Text></View>
+        <AppIcon name="chevron-forward" size={18} color={Palette.textSecondary} />
       </TouchableOpacity>
-      <Text style={s.note}>Your learning stays with you when you add a trip.</Text>
     </ScrollView>
   </SafeAreaView>;
 }
@@ -76,7 +76,6 @@ const s = StyleSheet.create({
   content: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 120, maxWidth: 640, width: '100%', alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26 },
   brand: { fontFamily: F.displayMedium, fontSize: 34, color: Palette.textPrimary },
-  settings: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#3a4251' },
   welcome: { fontFamily: F.bodyMedium, fontSize: 14, color: Palette.textSecondary, marginBottom: 8 },
   heading: { fontFamily: F.bodySemiBold, fontSize: 28, lineHeight: 35, letterSpacing: -0.6, color: Palette.textPrimary },
   intro: { fontFamily: F.body, fontSize: 16, lineHeight: 24, color: Palette.textSecondary, marginTop: 8, marginBottom: 24 },
@@ -90,11 +89,11 @@ const s = StyleSheet.create({
   progress: { fontFamily: F.bodyMedium, fontSize: 13, lineHeight: 20, color: '#655f52', marginTop: 14 },
   primary: { minHeight: 56, backgroundColor: '#263c36', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 22 },
   primaryText: { flex: 1, fontFamily: F.bodySemiBold, fontSize: 16, color: '#fffaf0' },
+  resume: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52, marginTop: 8, paddingVertical: 8 },
+  resumeTitle: { fontFamily: F.bodySemiBold, fontSize: 13, color: '#263c36' },
+  resumeTopic: { fontFamily: F.body, fontSize: 12, lineHeight: 18, color: '#655f52', marginTop: 3 },
   offline: { fontFamily: F.body, fontSize: 12, lineHeight: 18, color: '#655f52', textAlign: 'center', marginTop: 12 },
-  plan: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 22 },
-  planIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: '#252e39', alignItems: 'center', justifyContent: 'center' },
-  planTitle: { fontFamily: F.bodySemiBold, fontSize: 17, color: Palette.textPrimary },
-  planBody: { fontFamily: F.body, fontSize: 14, lineHeight: 21, color: Palette.textSecondary, marginTop: 4 },
-  planLink: { fontFamily: F.bodySemiBold, fontSize: 14, color: Palette.gold, marginTop: 6 },
-  note: { fontFamily: F.body, fontSize: 13, lineHeight: 20, color: Palette.textSecondary, marginTop: 6 },
+  plan: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingVertical: 12 },
+  planTitle: { fontFamily: F.bodyMedium, fontSize: 15, color: Palette.textPrimary },
+  planBody: { fontFamily: F.body, fontSize: 12, lineHeight: 18, color: Palette.textSecondary, marginTop: 2 },
 });

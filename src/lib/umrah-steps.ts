@@ -27,7 +27,7 @@ export const UMRAH_STEPS: UmrahStep[] = [
     title: 'Enter Ihram',
     arabicTitle: 'ٱلْإِحْرَام',
     detail:
-      'Before reaching the Miqat, perform Ghusl (full body wash), wear your Ihram garments (two white unstitched cloths for men), and make the intention (niyyah) for Umrah. Then recite the Talbiyah.',
+      'At the Miqat, bathe if able and put on suitable clothing. Enter Ihram with the intention in your heart to perform Umrah, saying "Labbayka Umrah", then recite the Talbiyah. Continue the Talbiyah until you reach the Ka\'bah to begin Tawaf. Ihram is a sacred state, not just clothing.',
     dua: {
       arabic: 'لَبَّيْكَ ٱللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ ٱلْحَمْدَ وَٱلنِّعْمَةَ لَكَ وَٱلْمُلْكَ، لَا شَرِيكَ لَكَ',
       transliteration:
@@ -44,13 +44,13 @@ export const UMRAH_STEPS: UmrahStep[] = [
     arabicTitle: 'دُخُول ٱلْمَسْجِد',
     glyph: 'mosque',
     detail:
-      'Enter al-Masjid al-Haram through Bab as-Salam or any door. Step in with your right foot first and recite the du\'a for entering.',
+      'Enter al-Masjid al-Haram through an open entrance, following the signs and staff guidance. Step in with your right foot and recite the du\'a for entering.',
     dua: {
-      arabic: 'بِسْمِ ٱللَّهِ، وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّهِ، ٱللَّهُمَّ ٱفْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
+      arabic: 'بِسْمِ ٱللَّهِ، وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّهِ، أَعُوذُ بِٱللَّهِ ٱلْعَظِيمِ وَبِوَجْهِهِ ٱلْكَرِيمِ وَسُلْطَانِهِ ٱلْقَدِيمِ مِنَ ٱلشَّيْطَانِ ٱلرَّجِيمِ، ٱللَّهُمَّ ٱفْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
       transliteration:
-        'Bismillaah, was-salaatu was-salaamu \'alaa Rasoolillaah. Allaahumma iftah lee abwaaba rahmatik',
+        'Bismillaah, was-salaatu was-salaamu \'alaa Rasoolillaah. A\'oodhu billaahil-\'azeem, wa biwajhihil-kareem, wa sultaanihil-qadeem, minash-shaytaanir-rajeem. Allaahumma iftah lee abwaaba rahmatik',
       translation:
-        'In the name of Allah, and peace and blessings be upon the Messenger of Allah. O Allah, open for me the doors of Your mercy.',
+        'In the name of Allah, and peace and blessings be upon the Messenger of Allah. I seek refuge in Allah the Magnificent, His noble Face and His eternal authority, from the accursed Satan. O Allah, open for me the doors of Your mercy.',
     },
     icon: 'enter',
     important: true,
@@ -60,9 +60,8 @@ export const UMRAH_STEPS: UmrahStep[] = [
     phase: 'First Sight',
     title: 'See the Ka\'bah',
     detail:
-      'When you first see the Ka\'bah, stop and raise your hands in du\'a. This is a moment when supplications are accepted — ask Allah for whatever you wish.',
+      'Orient yourself towards the Ka\'bah and locate the Black Stone corner before beginning Tawaf. Keep entrances and walking routes clear. Seeing the Ka\'bah is not an additional ritual step; no special first-sight du\'a or promise of acceptance is prescribed here.',
     icon: 'eye',
-    important: true,
   },
   {
     id: 'tawaf-start',
@@ -71,11 +70,11 @@ export const UMRAH_STEPS: UmrahStep[] = [
     arabicTitle: 'ٱلطَّوَاف',
     glyph: 'kaaba',
     detail:
-      'Start at the Black Stone corner (green light marks it). If possible, touch or kiss it. If crowded, point with your right hand and say "Allahu Akbar". Keep the Ka\'bah on your left.',
+      'Be in a state of ritual purity before Tawaf, as explained in Ibn Baz\'s guide. Begin in line with the Black Stone corner; the green wall light helps identify that alignment. Keep the Ka\'bah on your left and go around it seven times, outside the semicircular Hijr enclosure. Touch and kiss the Black Stone only if possible without harming anyone. Otherwise, point towards it with your right hand and say "Allahu Akbar"; do not kiss your hand when pointing.',
     dua: {
-      arabic: 'بِسْمِ ٱللَّهِ، ٱللَّهُ أَكْبَرُ',
-      transliteration: 'Bismillaah, Allahu Akbar',
-      translation: 'In the name of Allah, Allah is the Greatest.',
+      arabic: 'ٱللَّهُ أَكْبَرُ',
+      transliteration: 'Allahu Akbar',
+      translation: 'Allah is the Greatest.',
     },
     laps: {
       total: 7,
@@ -91,7 +90,7 @@ export const UMRAH_STEPS: UmrahStep[] = [
     title: 'Fast Walk (Raml)',
     arabicTitle: 'ٱلرَّمَل',
     detail:
-      'First three rounds: men walk briskly with short steps. Practice Idtiba (uncover right shoulder). Recite du\'a between the Yemeni Corner and Black Stone.',
+      'For men, Raml is recommended in the first three circuits of this Umrah Tawaf: brisk, short steps when space allows. Walk normally in circuits 4–7. If crowded, walk normally without pushing. Idtiba (uncovering the right shoulder) is recommended for men throughout all seven circuits of this Tawaf; cover both shoulders afterwards, before prayer. Women walk normally throughout and remain covered. The du\'a shown is recited between the Yemeni Corner and Black Stone in every circuit.',
     dua: {
       arabic: 'رَبَّنَا آتِنَا فِي ٱلدُّنْيَا حَسَنَةً وَفِي ٱلْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ ٱلنَّارِ',
       transliteration: 'Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa \'adhaab an-naar',
@@ -113,7 +112,7 @@ export const UMRAH_STEPS: UmrahStep[] = [
     title: '2 Rak\'ah Prayer',
     arabicTitle: 'صَلَاة ٱلْمَقَام',
     detail:
-      'Pray 2 rak\'ah behind Maqam Ibrahim. Recite Surah al-Kafirun in the first, Surah al-Ikhlas in the second. If crowded, pray anywhere in the mosque.',
+      'After Tawaf, cover both shoulders and offer two rak\'ahs behind Maqam Ibrahim if space allows; otherwise, pray elsewhere in the mosque without blocking pilgrims. After al-Fatihah, al-Kafirun in the first rak\'ah and al-Ikhlas in the second are recommended; other surahs may also be recited.',
     dua: {
       arabic: 'وَٱتَّخِذُوا مِن مَّقَامِ إِبْرَاهِيمَ مُصَلًّى',
       transliteration: 'Wat-takhidhoo min maqaami Ibraaheema musalla',
@@ -127,7 +126,7 @@ export const UMRAH_STEPS: UmrahStep[] = [
     phase: 'Zamzam',
     title: 'Drink Zamzam',
     detail:
-      'Face the Qiblah, say "Bismillah", drink in three sips. "Zamzam water is for whatever it is drunk for." Ask for knowledge, provision, and cure.',
+      'Drinking Zamzam is recommended when it is available. Use a marked drinking point and leave room for others. This is not a required step for completing Umrah; no fixed number of sips, direction or special formula is required by this guide.',
     icon: 'water',
   },
   {
@@ -136,11 +135,11 @@ export const UMRAH_STEPS: UmrahStep[] = [
     title: 'Mount Safa',
     arabicTitle: 'ٱلسَّعْي',
     detail:
-      'Go to Mount Safa. Face the Ka\'bah, raise your hands, say "Allahu Akbar" three times and make du\'a.',
+      'Begin Sa\'i at Safa. On first approaching it, recite the verse shown. Stand on or by Safa, face the Qiblah, praise Allah and recite the remembrance shown, raising your hands in personal du\'a. Repeat the remembrance and supplication three times. At Marwa, do likewise, without repeating the verse for approaching Safa.',
     dua: {
-      arabic: 'إِنَّ ٱلصَّفَا وَٱلْمَرْوَةَ مِن شَعَائِرِ ٱللَّهِ',
-      transliteration: 'Innas-Safaa wal-Marwata min sha\'aa\'irillaah',
-      translation: 'Indeed, Safa and Marwa are among the symbols of Allah. (Quran 2:158)',
+      arabic: 'إِنَّ ٱلصَّفَا وَٱلْمَرْوَةَ مِن شَعَائِرِ ٱللَّهِ\n\nلَا إِلَٰهَ إِلَّا ٱللَّهُ وَٱللَّهُ أَكْبَرُ، لَا إِلَٰهَ إِلَّا ٱللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ ٱلْمُلْكُ وَلَهُ ٱلْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، لَا إِلَٰهَ إِلَّا ٱللَّهُ وَحْدَهُ، أَنْجَزَ وَعْدَهُ وَنَصَرَ عَبْدَهُ وَهَزَمَ ٱلْأَحْزَابَ وَحْدَهُ',
+      transliteration: 'On first approaching Safa: Innas-Safaa wal-Marwata min sha\'aa\'irillaah.\n\nAt Safa and Marwa: Laa ilaaha illallaahu wallaahu akbar. Laa ilaaha illallaahu wahdahu laa shareeka lah, lahul-mulku wa lahul-hamdu wa huwa \'alaa kulli shay\'in qadeer. Laa ilaaha illallaahu wahdah, anjaza wa\'dah, wa nasara \'abdah, wa hazamal-ahzaaba wahdah.',
+      translation: 'On first approaching Safa: Indeed, Safa and Marwa are among the symbols of Allah. (Quran 2:158)\n\nAt Safa and Marwa: There is no god but Allah, and Allah is the Greatest. There is no god but Allah alone, without partner. To Him belongs sovereignty and praise, and He has power over all things. There is no god but Allah alone; He fulfilled His promise, aided His servant and defeated the confederates alone. Make personal du\'a between repetitions.',
     },
     icon: 'flag',
     important: true,
@@ -150,7 +149,7 @@ export const UMRAH_STEPS: UmrahStep[] = [
     phase: '7 Laps',
     title: 'Safa ↔ Marwa',
     detail:
-      'Walk Safa→Marwa (1), Marwa→Safa (2)… 7 laps ending at Marwa. Men jog between the green lights. Make personal du\'a throughout.',
+      'Walk Safa→Marwa (1), Marwa→Safa (2), until seven lengths end at Marwa. Men may move faster between the green markers when able; women walk throughout. Make personal du\'a along the way.',
     laps: {
       total: 7,
       fastWalkLaps: 0,
@@ -164,7 +163,7 @@ export const UMRAH_STEPS: UmrahStep[] = [
     title: 'Shave / Trim',
     arabicTitle: 'ٱلْحَلْق',
     detail:
-      'Men: shaving (Halq) is preferred. Women: trim a fingertip\'s length. After this, all Ihram restrictions are lifted.',
+      'After completing Sa\'i, men shave the head or shorten the hair across the whole head. Shaving is generally preferred; Ibn Baz recommends shortening when Hajj is close so the head can be shaved for Hajj. Women gather their hair and cut a fingertip\'s length or less from the ends; they do not shave. Completing this after Tawaf and Sa\'i ends the restrictions of Ihram.',
     icon: 'cut',
     important: true,
   },
@@ -173,7 +172,7 @@ export const UMRAH_STEPS: UmrahStep[] = [
     phase: 'Alhamdulillah',
     title: 'Umrah Complete!',
     detail:
-      'Your Umrah is complete! You are free from Ihram. May Allah accept your worship.',
+      'After completing Tawaf, Sa\'i and shaving or trimming, the restrictions of Ihram end. May Allah accept your worship. Checking off items in Qasd records your progress; it does not determine whether a ritual is valid.',
     icon: 'checkmark-circle',
     important: true,
   },

@@ -40,7 +40,7 @@ function JourneyStop({ step, completed, isNext, disabled, onToggle, last }: {
   return <View style={[s.stop, !last && s.stopBorder, isNext && s.nextStop]}>
     <View style={s.stopRow}>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Details for ${step.title}`} accessibilityState={{ expanded }} onPress={() => setExpanded(value => !value)} activeOpacity={0.75} style={s.stopMain}>
-        <View style={[s.stopIcon, isNext && s.nextIcon]}><AppIcon name={step.icon} size={22} color={isNext ? C.paper : '#d5c7aa'} /></View>
+        <View style={s.stopIcon}><AppIcon name={step.icon} size={22} color={isNext ? C.paper : '#d5c7aa'} /></View>
         <View style={s.flex}>
           <Text style={[s.stopTitle, isNext && { color: C.paper }]}>{step.title}</Text>
           <Text style={s.stopSubtitle}>{step.subtitle}</Text>
@@ -138,7 +138,7 @@ const s = StyleSheet.create({
   content: { paddingHorizontal: 24, paddingTop: 24, paddingBottom: 120, width: '100%', maxWidth: 640, alignSelf: 'center' },
   flex: { flex: 1, minWidth: 0 },
   headingRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  headingIcon: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.line },
+  headingIcon: { alignItems: 'center', justifyContent: 'center' },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
   tripCard: { backgroundColor: C.paper, borderRadius: 22, padding: 22 },
   paperEyebrow: { ...T.eyebrow, color: C.paperMuted, flex: 1 },
@@ -161,7 +161,7 @@ const s = StyleSheet.create({
   filterTextSelected: { color: C.ink },
   phase: { marginBottom: 28 },
   phaseHeading: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
-  phaseNumber: { width: 38, height: 38, borderRadius: 14, backgroundColor: C.iconSurface, justifyContent: 'center', alignItems: 'center' },
+  phaseNumber: { justifyContent: 'center', alignItems: 'center' },
   phaseCount: { ...T.label, color: '#c8b78f' },
   stops: { borderRadius: 20, overflow: 'hidden', backgroundColor: C.surface },
   stop: { padding: 16 },
@@ -169,8 +169,7 @@ const s = StyleSheet.create({
   nextStop: { backgroundColor: '#25372f' },
   stopRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   stopMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64 },
-  stopIcon: { width: 40, height: 46, borderRadius: 12, backgroundColor: C.iconSurface, alignItems: 'center', justifyContent: 'center' },
-  nextIcon: { backgroundColor: '#34483b' },
+  stopIcon: { alignItems: 'center', justifyContent: 'center' },
   stopTitle: { fontFamily: QasdFonts.bodyMedium, fontSize: 15, color: C.cream, lineHeight: 21 },
   stopSubtitle: { ...T.label, marginTop: 4 },
   stopMeta: { ...T.label, fontSize: 11, marginTop: 6, color: '#c0b59f' },

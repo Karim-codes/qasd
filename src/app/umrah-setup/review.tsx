@@ -207,10 +207,6 @@ const s = StyleSheet.create({
     gap: 10,
   },
   iconBubble: {
-    width: 28,
-    height: 28,
-    borderRadius: 9,
-    backgroundColor: Palette.goldMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },

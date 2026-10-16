@@ -192,9 +192,6 @@ export default function HomeTab() {
           <Text style={styles.greeting}>{firstName ? `As-salamu alaykum, ${firstName}` : 'As-salamu alaykum'}</Text>
           <Text style={styles.date}>{new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(now)}</Text>
         </View>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open settings" onPress={() => router.push('/settings')} style={styles.avatar}>
-          <Ionicons name="person-outline" size={20} color={Palette.textPrimary} />
-        </TouchableOpacity>
       </View>
 
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="View your full journey" onPress={() => router.push('/(tabs)/journey')} activeOpacity={0.8} style={styles.tripHeader}>
@@ -237,11 +234,10 @@ export default function HomeTab() {
       {action.type !== 'checklist' && <PreparationRow />}
 
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/stays')} activeOpacity={0.8} style={styles.stayRow}>
-        <View style={styles.stayIcon}><Ionicons name="bed-outline" size={23} color="#d5c7aa" /></View>
+        <Ionicons name="bed-outline" size={22} color="#d5c7aa" />
         <View style={styles.flex}>
-          <Text style={styles.smallLabel}>{currentStay ? 'Your stay' : 'Accommodation'}{stay?.city ? ` · ${stay.city}` : ''}</Text>
           <Text style={styles.stayName}>{stay?.name || 'Add your hotel'}</Text>
-          <Text style={styles.smallLabel}>{stay?.checkIn ? `${formatDateShort(stay.checkIn)} — ${formatDateShort(stay.checkOut)}` : 'Keep your stay details close'}</Text>
+          <Text style={styles.smallLabel}>{[stay?.city, stay?.checkIn ? `${formatDateShort(stay.checkIn)} — ${formatDateShort(stay.checkOut)}` : null].filter(Boolean).join(' · ') || 'Accommodation'}</Text>
         </View>
         <Ionicons name="chevron-forward" size={18} color={Palette.textSecondary} />
       </TouchableOpacity>
@@ -263,7 +259,6 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 24 },
   greeting: { color: '#e6e3dc', fontFamily: QasdFonts.bodyMedium, fontSize: 15 },
   date: { color: '#9ba6ba', fontFamily: QasdFonts.body, fontSize: 13, marginTop: 5 },
-  avatar: { width: 46, height: 46, borderRadius: 23, borderWidth: 1, borderColor: '#3a4251', alignItems: 'center', justifyContent: 'center' },
   tripHeader: { marginBottom: 22 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
   tripLabel: { fontFamily: QasdFonts.bodySemiBold, fontSize: 11, letterSpacing: 2, color: '#c8b78f' },
@@ -283,9 +278,8 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginTop: 32, marginBottom: 18 },
   sectionTitle: { fontFamily: QasdFonts.bodySemiBold, fontSize: 20, color: '#f0ece2' },
   smallLabel: { fontFamily: QasdFonts.body, fontSize: 13, color: '#aab3c2', lineHeight: 19 },
-  stayRow: { flexDirection: 'row', gap: 14, alignItems: 'center', paddingVertical: 22, borderBottomWidth: 1, borderBottomColor: '#2a3341' },
-  stayIcon: { width: 50, height: 58, borderRadius: 12, backgroundColor: '#252e39', alignItems: 'center', justifyContent: 'center' },
-  stayName: { fontFamily: QasdFonts.bodyMedium, fontSize: 16, color: '#eeeae2', marginVertical: 4, lineHeight: 22 },
+  stayRow: { flexDirection: 'row', gap: 12, alignItems: 'center', minHeight: 64, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2a3341' },
+  stayName: { fontFamily: QasdFonts.bodyMedium, fontSize: 15, color: '#eeeae2', marginBottom: 2, lineHeight: 21 },
   prayerCard: { borderBottomWidth: 1, borderBottomColor: '#2a3341', paddingBottom: 16 },
   prayerRow: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 56 },
   prayerName: { fontFamily: QasdFonts.bodyMedium, fontSize: 18, color: '#eeeae2', marginTop: 4 },
