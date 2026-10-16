@@ -20,7 +20,7 @@ export const PREPARATION_ITEMS: ChecklistItem[] = [
   { id: 'charger-adaptor', title: 'Charger and adaptor', source: 'qasd' },
   { id: 'footwear', title: 'Comfortable footwear', source: 'qasd' },
   { id: 'emergency-contact', title: 'Save an emergency contact', source: 'qasd' },
-  { id: 'offline-content', title: 'Download essential content', source: 'qasd' },
+  { id: 'offline-content', title: 'Try the guide without internet', source: 'qasd' },
   { id: 'review-talbiyah', title: 'Review the Talbiyah', source: 'qasd' },
 ];
 

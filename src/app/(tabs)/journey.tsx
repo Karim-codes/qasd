@@ -1,3 +1,5 @@
+import { useTabContentInset } from '@/hooks/use-tab-content-inset';
+import { TripEmptyState } from '@/components/trip-empty-state';
 import { AppIcon } from '@/components/app-icon';
 import { LocalSaveStatus } from '@/components/local-save-status';
 import { QasdFonts } from '@/constants/qasd-theme';
@@ -62,6 +64,7 @@ function JourneyStop({ step, completed, isNext, disabled, onToggle, last }: {
 }
 
 export default function JourneyTab() {
+  const contentInset = useTabContentInset();
   const { itinerary, trip } = useItinerary();
   const progress = useJourneyProgress();
   const guide = useGuideProgress();
@@ -69,7 +72,7 @@ export default function JourneyTab() {
   const router = useRouter();
   const [selected, setSelected] = useState('all');
   const now = new Date(useNow());
-  if (!itinerary || !trip) return null;
+  if (!itinerary || !trip) return <TripEmptyState />;
   const { tripType, phases } = buildSteps(itinerary, now);
   const steps = phases.flatMap(phase => phase.steps);
   const done = steps.filter(step => progress.value[step.id]).length;
@@ -86,7 +89,7 @@ export default function JourneyTab() {
   };
 
   return <SafeAreaView style={s.container} edges={['top']}>
-    <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={[s.content, { paddingBottom: contentInset }]} showsVerticalScrollIndicator={false}>
       <View style={s.headingRow}>
         <View style={s.flex}><Text style={T.eyebrow}>{tripType === 'umrah' ? 'YOUR UMRAH' : 'YOUR HAJJ'}</Text><Text style={[T.title, { marginTop: 8 }]}>The journey</Text></View>
         <View style={s.headingIcon}><AppIcon name="map-outline" size={25} color={C.gold} /></View>
@@ -103,7 +106,7 @@ export default function JourneyTab() {
         <View style={s.paperDivider} />
         <View style={s.between}><Text style={s.progressLabel}>{finished ? 'Your journey, remembered.' : 'A little closer with every step.'}</Text><Text style={s.progressCount}>{progress.ready ? `${done}/${steps.length}` : '—'}</Text></View>
         <View style={s.progressTrack}><View style={[s.progressFill, { width: `${progress.ready ? done / Math.max(1, steps.length) * 100 : 0}%` }]} /></View>
-        {actionReady && <TouchableOpacity accessibilityRole="button" onPress={() => router.push(action.step ? { pathname: '/umrah-guide', params: { step: action.step } } : action.route)} style={s.nextAction}>
+        {actionReady && <TouchableOpacity accessibilityRole="button" onPress={() => router.push(action.step ? { pathname: '/umrah-guide', params: { step: action.step, mode: action.destination.params?.mode ?? 'learn' } } : action.route)} style={s.nextAction}>
           <View style={s.flex}><Text style={s.nextActionLabel}>{action.eyebrow.toUpperCase()}</Text><Text style={s.nextActionTitle}>{action.title}</Text></View><AppIcon name="arrow-forward" size={20} color={C.paper} />
         </TouchableOpacity>}
       </View>

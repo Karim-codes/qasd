@@ -74,10 +74,15 @@ export default function UmrahReviewScreen() {
       },
     };
 
-    await setItinerary(itinerary);
-    await setOriginalItinerary(itinerary);
-    setSaving(false);
-    router.replace('/umrah-setup/bismillah');
+    try {
+      await setItinerary(itinerary);
+      await setOriginalItinerary(itinerary);
+      router.replace('/umrah-setup/bismillah');
+    } catch {
+      // The provider explains the failed save; keep the draft available to retry.
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -85,8 +90,8 @@ export default function UmrahReviewScreen() {
       step={4}
       total={4}
       title={'Review &\nconfirm'}
-      subtitle="Tap any section to edit. When it looks right, begin your Umrah."
-      primaryLabel={saving ? 'Saving...' : 'Confirm & Begin'}
+      subtitle="Tap any section to edit. You can add missing details later."
+      primaryLabel={saving ? 'Saving...' : 'Save my trip'}
       primaryDisabled={saving}
       onPrimary={confirm}
     >

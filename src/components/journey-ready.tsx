@@ -10,8 +10,8 @@ export function JourneyReady({ umrah = false }: { umrah?: boolean }) {
   return <SafeAreaView style={s.container} edges={['top', 'bottom']}>
     <ScrollView contentContainerStyle={s.content}>
       <Text style={T.eyebrow}>{umrah ? 'YOUR UMRAH BEGINS' : 'YOUR HAJJ BEGINS'}</Text>
-      <Text style={[T.title, { marginTop: 14, marginBottom: 12 }]}>Your journey{ '\n' }is ready.</Text>
-      <Text style={T.body}>Your itinerary is in place. Take the next step at your own pace.</Text>
+      <Text style={[T.title, { marginTop: 14, marginBottom: 12 }]}>{umrah ? 'Your trip is saved.' : 'Your journey\nis ready.'}</Text>
+      <Text style={T.body}>{umrah ? 'Keep learning and preparing. You can add travel details whenever you’re ready.' : 'Your itinerary is in place. Take the next step at your own pace.'}</Text>
       <View style={s.card}>
         <View style={s.icon}><AppIcon name="checkmark" size={26} color={C.paper} /></View>
         <Text style={s.arabic}>بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</Text>

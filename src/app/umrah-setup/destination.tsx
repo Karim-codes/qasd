@@ -42,7 +42,7 @@ export default function UmrahDestinationScreen() {
       step={1}
       total={4}
       hideBack
-      onBack={() => router.replace('/choose-trip')}
+      onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}
       title={'Where to\nfirst?'}
       subtitle="Umrah is performed in Makkah. Pick the order you'll visit the holy cities — you can change it anytime."
       primaryLabel="Continue"

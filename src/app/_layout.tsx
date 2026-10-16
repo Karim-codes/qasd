@@ -15,7 +15,8 @@ import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { AccessibilityInfo, ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
@@ -36,6 +37,13 @@ const QasdDarkTheme = {
 };
 
 export default function RootLayout() {
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void AccessibilityInfo.isReduceMotionEnabled().then(value => { if (!cancelled) setReduceMotion(value); });
+    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    return () => { cancelled = true; subscription.remove(); };
+  }, []);
   const [fontsLoaded] = useFonts({
     CormorantGaramond_400Regular,
     CormorantGaramond_500Medium,
@@ -71,6 +79,8 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="hajj-guide" options={{ presentation: 'card' }} />
             <Stack.Screen name="umrah-guide" options={{ presentation: 'card' }} />
+            <Stack.Screen name="umrah-overview" options={{ presentation: 'card', animation: reduceMotion ? 'none' : 'default', gestureEnabled: true }} />
+            <Stack.Screen name="umrah-topic" options={{ presentation: 'card', animation: reduceMotion ? 'none' : 'default', gestureEnabled: true }} />
             <Stack.Screen name="stays" options={{ presentation: 'card' }} />
             <Stack.Screen name="checklist" options={{ presentation: 'card' }} />
             <Stack.Screen name="settings" options={{ presentation: 'card' }} />

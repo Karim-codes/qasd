@@ -194,7 +194,7 @@ test('Makkah-only setup omits Madinah and completed trip shows review', () => {
 });
 test('missing dates and Hajj itineraries produce navigable fallbacks', () => {
   const value = clone(EMPTY_ITINERARY);
-  assert.equal(getHomeAction(value, {}, EMPTY_GUIDE).route, '/(tabs)/flights');
+  assert.equal(getHomeAction(value, {}, EMPTY_GUIDE).route, '/checklist');
   value.tripType = 'hajj'; value.hajj = { arafahDate: date(1) };
   const steps = buildSteps(value).phases.flatMap(phase => phase.steps);
   assert.equal(steps.find(step => step.id === 'tarwiyah').status, 'active');

@@ -1,3 +1,4 @@
+import { useTabContentInset } from '@/hooks/use-tab-content-inset';
 import { Palette, QasdFonts } from '@/constants/qasd-theme';
 import { useItinerary } from '@/context/itinerary-context';
 import { useGuideProgress, useJourneyProgress, usePreparationChecklist } from '@/hooks/use-local-progress';
@@ -5,7 +6,8 @@ import { useNow } from '@/hooks/use-now';
 import { LocalSaveStatus } from '@/components/local-save-status';
 import { daysBetween, daysUntil, formatDateShort, getCurrentStay, getNextOrCurrentStay } from '@/lib/date-helpers';
 import { getNextJourneyAction } from '@/lib/home-action';
-import { buildSteps } from '@/lib/journey';
+import { ExploreHome } from '@/components/explore-home';
+import { PreparationRow } from '@/components/preparation-row';
 import { AppIcon as Ionicons } from '@/components/app-icon';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -151,6 +153,7 @@ function WeatherTile({ city }: { city: string }) {
 }
 
 export default function HomeTab() {
+  const contentInset = useTabContentInset();
   const router = useRouter();
   const { itinerary, trip, isLoading } = useItinerary();
   const journey = useJourneyProgress();
@@ -158,19 +161,18 @@ export default function HomeTab() {
   const checklist = usePreparationChecklist();
   const nowValue = useNow();
   const now = new Date(nowValue);
-  useEffect(() => { if (!isLoading && !itinerary) router.replace('/'); }, [isLoading, itinerary, router]);
-  if (!itinerary || !trip) return null;
+  if (isLoading) return null;
+  if (!itinerary || !trip) return <ExploreHome />;
 
-  const { tripType, phases } = buildSteps(itinerary, now);
-  const isUmrah = tripType === 'umrah';
-  const firstName = itinerary.pilgrim.name.trim().split(/\s+/)[0] || 'Pilgrim';
+  const isUmrah = trip.tripType === 'umrah';
+  const firstName = itinerary.pilgrim.name.trim().split(/\s+/)[0];
   const departure = itinerary.flights.outbound.departureDate;
   const arrivalHome = itinerary.flights.return.arrivalDate;
   const daysLeft = daysUntil(departure, now);
   const daysHome = daysUntil(arrivalHome, now);
   const tripDays = daysBetween(departure, arrivalHome);
   const inProgress = daysLeft !== null && daysLeft <= 0 && daysHome !== null && daysHome >= 0;
-  const status = inProgress ? `Day ${1 - daysLeft} of ${(tripDays ?? 0) + 1}` : daysLeft !== null && daysLeft > 0 ? `In ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}` : daysHome !== null && daysHome < 0 ? 'Journey complete' : 'Your journey';
+  const status = inProgress ? `Day ${1 - daysLeft} of ${(tripDays ?? 0) + 1}` : daysLeft !== null && daysLeft > 0 ? `In ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}` : daysHome !== null && daysHome < 0 ? 'Trip ended' : 'Your journey';
   const currentStay = getCurrentStay(itinerary.hotels);
   const stay = getNextOrCurrentStay(itinerary.hotels);
   const cities = itinerary.umrah?.route === 'madinah-makkah' ? ['Madinah', 'Makkah'] : itinerary.umrah?.route === 'makkah-only' ? ['Makkah'] : ['Makkah', 'Madinah'];
@@ -181,15 +183,13 @@ export default function HomeTab() {
       : action.type === 'checklist' ? 'checkmark-done-outline'
         : action.type === 'ritual' ? 'compass-outline'
           : 'map-outline';
-  const steps = phases.flatMap(phase => phase.steps);
-  const completed = steps.filter(step => journey.value[step.id]).length;
   const ready = journey.ready && guide.ready && checklist.ready;
 
   return <SafeAreaView style={styles.container} edges={['top']}>
-    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={[styles.content, { paddingBottom: contentInset }]} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View style={styles.flex}>
-          <Text style={styles.greeting}>As-salamu alaykum, {firstName}</Text>
+          <Text style={styles.greeting}>{firstName ? `As-salamu alaykum, ${firstName}` : 'As-salamu alaykum'}</Text>
           <Text style={styles.date}>{new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(now)}</Text>
         </View>
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open settings" onPress={() => router.push('/settings')} style={styles.avatar}>
@@ -209,7 +209,7 @@ export default function HomeTab() {
           </View>)}
         </View>
         <View style={styles.rowBetween}>
-          <Text style={styles.meta}>{formatDateShort(departure)} — {formatDateShort(arrivalHome)}</Text>
+          <Text style={styles.meta}>{[departure && formatDateShort(departure), arrivalHome && formatDateShort(arrivalHome)].filter(Boolean).join(' — ') || 'Travel dates to add'}</Text>
           <Ionicons name="arrow-forward" size={19} color={Palette.textSecondary} />
         </View>
       </TouchableOpacity>
@@ -221,7 +221,7 @@ export default function HomeTab() {
         </View>
         <Text style={styles.nextTitle}>{ready ? action.title : 'Getting your place…'}</Text>
         <Text style={styles.nextDetail}>{ready ? action.detail : 'Loading the progress saved on this device.'}</Text>
-        <TouchableOpacity disabled={!ready} accessibilityRole="button" style={[styles.nextButton, !ready && { opacity: 0.5 }]} activeOpacity={0.8} onPress={() => router.push(action.step ? { pathname: '/umrah-guide', params: { step: action.step } } : action.route)}>
+        <TouchableOpacity disabled={!ready} accessibilityRole="button" style={[styles.nextButton, !ready && { opacity: 0.5 }]} activeOpacity={0.8} onPress={() => router.push(action.step ? { pathname: '/umrah-guide', params: { step: action.step, mode: action.destination.params?.mode ?? 'learn' } } : action.route)}>
           <Text style={styles.nextButtonText}>{ready ? action.cta : 'Loading…'}</Text>
           <Ionicons name="arrow-forward" size={20} color="#fffaf0" />
         </TouchableOpacity>
@@ -232,31 +232,9 @@ export default function HomeTab() {
       </View>
       {(journey.error || !journey.ready || journey.saving) && <LocalSaveStatus record={journey} />}
       {(guide.error || !guide.ready || guide.saving) && <LocalSaveStatus record={guide} />}
-      {(checklist.error || !checklist.ready || checklist.saving) && <LocalSaveStatus record={checklist} />}
+      {(checklist.error || !checklist.ready || checklist.saving) && (action.type === 'checklist' || !checklist.ready) && <LocalSaveStatus record={checklist} />}
 
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Your trip, at hand</Text>
-        <Text style={styles.smallLabel}>{completed}/{steps.length} complete</Text>
-      </View>
-      <View style={styles.shortcutRow}>
-        <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/flights')} style={styles.shortcut}>
-          <Ionicons name="airplane-outline" size={23} color={Palette.gold} />
-          <Text style={styles.shortcutTitle}>Flights</Text>
-          <Text style={styles.smallLabel}>Times & details</Text>
-        </TouchableOpacity>
-        <View style={styles.shortcutDivider} />
-        <TouchableOpacity accessibilityRole="button" onPress={() => router.push(isUmrah ? '/umrah-guide' : '/hajj-guide')} style={styles.shortcut}>
-          <Ionicons name="book-outline" size={23} color={Palette.gold} />
-          <Text style={styles.shortcutTitle}>{isUmrah ? 'Umrah guide' : 'Hajj guide'}</Text>
-          <Text style={styles.smallLabel}>Read at your pace</Text>
-        </TouchableOpacity>
-        <View style={styles.shortcutDivider} />
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open preparation checklist" onPress={() => router.push('/checklist')} style={styles.shortcut}>
-          <Ionicons name="checkmark-done-outline" size={23} color={Palette.gold} />
-          <Text style={styles.shortcutTitle}>Prepare</Text>
-          <Text style={styles.smallLabel}>Your checklist</Text>
-        </TouchableOpacity>
-      </View>
+      {action.type !== 'checklist' && <PreparationRow />}
 
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/stays')} activeOpacity={0.8} style={styles.stayRow}>
         <View style={styles.stayIcon}><Ionicons name="bed-outline" size={23} color="#d5c7aa" /></View>
@@ -268,9 +246,11 @@ export default function HomeTab() {
         <Ionicons name="chevron-forward" size={18} color={Palette.textSecondary} />
       </TouchableOpacity>
 
-      <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Around you</Text><Ionicons name="location-outline" size={18} color={Palette.textSecondary} /></View>
-      <PrayerSpotlight city={city} />
-      <WeatherTile city={city} />
+      {inProgress && currentStay && <>
+        <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>In {city}</Text><Ionicons name="location-outline" size={18} color={Palette.textSecondary} /></View>
+        <PrayerSpotlight city={city} />
+        <WeatherTile city={city} />
+      </>}
       <Text style={styles.blessing}>May every step bring you closer.</Text>
     </ScrollView>
   </SafeAreaView>;
@@ -280,33 +260,29 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#101827' },
   content: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 118, maxWidth: 640, width: '100%', alignSelf: 'center' },
   flex: { flex: 1, minWidth: 0 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 32 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 24 },
   greeting: { color: '#e6e3dc', fontFamily: QasdFonts.bodyMedium, fontSize: 15 },
   date: { color: '#9ba6ba', fontFamily: QasdFonts.body, fontSize: 13, marginTop: 5 },
   avatar: { width: 46, height: 46, borderRadius: 23, borderWidth: 1, borderColor: '#3a4251', alignItems: 'center', justifyContent: 'center' },
-  tripHeader: { marginBottom: 28 },
+  tripHeader: { marginBottom: 22 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
   tripLabel: { fontFamily: QasdFonts.bodySemiBold, fontSize: 11, letterSpacing: 2, color: '#c8b78f' },
   status: { fontFamily: QasdFonts.bodyMedium, fontSize: 13, color: '#d8d6ce' },
   cityRoute: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', marginTop: 10, marginBottom: 12 },
   cityPart: { flexDirection: 'row', alignItems: 'center' },
-  cityTitle: { fontFamily: QasdFonts.displayMedium, fontSize: 40, color: '#f5f0e5', lineHeight: 48 },
+  cityTitle: { fontFamily: QasdFonts.bodySemiBold, fontSize: 24, color: '#f5f0e5', lineHeight: 32 },
   meta: { fontFamily: QasdFonts.body, fontSize: 14, color: '#aab3c2', lineHeight: 21 },
   nextCard: { backgroundColor: '#eee7d8', borderRadius: 22, padding: 24 },
   nextEyebrow: { flex: 1, fontFamily: QasdFonts.bodySemiBold, fontSize: 12, color: '#716044' },
-  nextTitle: { fontFamily: QasdFonts.display, fontSize: 36, lineHeight: 39, color: '#202b2a', marginTop: 18, marginBottom: 10 },
+  nextTitle: { fontFamily: QasdFonts.bodySemiBold, fontSize: 28, lineHeight: 35, letterSpacing: -0.5, color: '#202b2a', marginTop: 14, marginBottom: 10 },
   nextDetail: { fontFamily: QasdFonts.body, fontSize: 15, lineHeight: 23, color: '#5b5b50', marginBottom: 22 },
   nextButton: { minHeight: 54, borderRadius: 12, paddingHorizontal: 18, paddingVertical: 14, backgroundColor: '#263c36', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   nextButtonText: { flex: 1, fontFamily: QasdFonts.bodySemiBold, fontSize: 15, color: '#fffaf0' },
   markDone: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 8 },
   markDoneText: { fontFamily: QasdFonts.bodyMedium, fontSize: 12, color: '#655c4b' },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginTop: 32, marginBottom: 18 },
-  sectionTitle: { fontFamily: QasdFonts.displayMedium, fontSize: 26, color: '#f0ece2' },
-  smallLabel: { fontFamily: QasdFonts.body, fontSize: 12, color: '#aab3c2', lineHeight: 19 },
-  shortcutRow: { flexDirection: 'row', paddingBottom: 24, borderBottomWidth: 1, borderBottomColor: '#2a3341' },
-  shortcut: { flex: 1, alignItems: 'flex-start', gap: 6, paddingLeft: 8, paddingVertical: 6, minHeight: 88 },
-  shortcutTitle: { color: '#eeeae2', fontFamily: QasdFonts.bodyMedium, fontSize: 16, marginTop: 4 },
-  shortcutDivider: { width: 1, backgroundColor: '#2a3341', marginRight: 24, marginVertical: 8 },
+  sectionTitle: { fontFamily: QasdFonts.bodySemiBold, fontSize: 20, color: '#f0ece2' },
+  smallLabel: { fontFamily: QasdFonts.body, fontSize: 13, color: '#aab3c2', lineHeight: 19 },
   stayRow: { flexDirection: 'row', gap: 14, alignItems: 'center', paddingVertical: 22, borderBottomWidth: 1, borderBottomColor: '#2a3341' },
   stayIcon: { width: 50, height: 58, borderRadius: 12, backgroundColor: '#252e39', alignItems: 'center', justifyContent: 'center' },
   stayName: { fontFamily: QasdFonts.bodyMedium, fontSize: 16, color: '#eeeae2', marginVertical: 4, lineHeight: 22 },

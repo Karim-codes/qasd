@@ -1,3 +1,5 @@
+import { useTabContentInset } from '@/hooks/use-tab-content-inset';
+import { TripEmptyState } from '@/components/trip-empty-state';
 import EditableField from '@/components/editable-field';
 import { TravelColors as C, TravelType } from '@/constants/travel-design';
 import { Palette, QasdFonts } from '@/constants/qasd-theme';
@@ -164,6 +166,7 @@ function BoardingPassCard({
 }
 
 export default function FlightsTab() {
+  const contentInset = useTabContentInset();
   const { itinerary } = useItinerary();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -171,13 +174,13 @@ export default function FlightsTab() {
     Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
   }, [fadeAnim]);
 
-  if (!itinerary) return null;
+  if (!itinerary) return <TripEmptyState flights />;
 
   const isUmrah = itinerary.tripType === 'umrah';
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={[styles.scrollContent, { paddingBottom: contentInset }]} showsVerticalScrollIndicator={false}>
         <View style={styles.headerSection}>
           <Text style={styles.screenTitle}>Your flights</Text>
           <Text style={styles.screenSubtitle}>

@@ -43,7 +43,7 @@ export default function ChecklistScreen() {
       <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={s.header}>
           <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={s.back}><AppIcon name="chevron-back" size={24} color={C.cream} /></TouchableOpacity>
-          <View style={s.headerCopy}><Text style={T.eyebrow}>BEFORE YOU TRAVEL</Text><Text style={T.title}>Preparation</Text></View>
+          <View style={s.headerCopy}><Text style={T.eyebrow}>BEFORE YOU TRAVEL</Text><Text style={[T.title, { fontFamily: QasdFonts.bodySemiBold, fontSize: 28, lineHeight: 35 }]}>Preparation</Text></View>
           <View style={s.headerIcon}><AppIcon name="checkmark-done-outline" size={24} color={C.gold} /></View>
         </View>
 

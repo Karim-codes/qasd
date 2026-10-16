@@ -155,7 +155,7 @@ function EditorSection({
 function SettingsCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={styles.settingsGroup}>
-      <Text style={styles.groupLabel}>{title.charAt(0) + title.slice(1).toLowerCase()}</Text>
+      <Text style={styles.groupLabel}>{title}</Text>
       <View style={styles.settingsCard}>{children}</View>
     </View>
   );
@@ -401,26 +401,28 @@ export default function SettingsScreen() {
   };
 
   if (!draft) {
-    return (
-      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <View style={styles.emptyWrap}>
-          <View style={styles.emptyIcon}>
-            <Ionicons name="compass-outline" size={30} color={Palette.gold} />
-          </View>
-          <Text style={styles.emptyTitle}>No journey yet</Text>
-          <Text style={styles.emptyText}>
-            Create a Hajj or Umrah journey to set up your local profile and preferences.
-          </Text>
-          <TouchableOpacity
-            style={styles.emptyButton}
-            onPress={() => router.replace('/choose-trip')}
-            activeOpacity={0.82}
-          >
-            <Text style={styles.emptyButtonText}>Set up my journey</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
+    return <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <View style={styles.header}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={leaveSettings} hitSlop={10} style={styles.backButton}><Ionicons name="chevron-back" size={25} color={Palette.textPrimary} /></TouchableOpacity>
+        <Text style={[styles.headerTitle, { fontFamily: QasdFonts.bodySemiBold, fontSize: 24 }]}>Settings</Text>
+      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={{ fontFamily: QasdFonts.body, color: Palette.textSecondary, fontSize: 16, lineHeight: 24, marginBottom: 24 }}>Your learning, practice and checklist are saved on this device. Add a trip whenever you’re ready.</Text>
+        <SettingsCard title="Your journey">
+          <SettingsRow icon="airplane-outline" title="Plan your Umrah" subtitle="Set up your Umrah journey" onPress={() => router.push('/umrah-setup/destination')} />
+          <SettingsDivider />
+          <SettingsRow icon="compass-outline" title="Plan your Hajj" subtitle="Set up your Hajj journey" onPress={() => router.push('/hajj-setup/welcome')} />
+        </SettingsCard>
+        <SettingsCard title="About Qasd">
+          <SettingsRow icon="shield-checkmark-outline" title="Data & privacy" onPress={() => setActiveInfo('privacy')} />
+          <SettingsDivider />
+          <SettingsRow icon="information-circle-outline" title="About Qasd" onPress={() => setActiveInfo('about')} />
+          <SettingsDivider />
+          <SettingsRow icon="document-text-outline" title="Terms & conditions" onPress={() => setActiveInfo('terms')} />
+        </SettingsCard>
+      </ScrollView>
+      <InfoSheet page={activeInfo ? INFO_PAGES[activeInfo] : null} onClose={() => setActiveInfo(null)} />
+    </SafeAreaView>;
   }
 
   return (

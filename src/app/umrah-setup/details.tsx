@@ -13,9 +13,6 @@ export default function UmrahDetailsScreen() {
   const visitsMadinah = routeVisitsMadinah(draft.route);
   const madinahFirst = routeMadinahFirst(draft.route);
 
-  const canContinue =
-    draft.pilgrimName.trim().length > 0 && draft.makkahHotel.name.trim().length > 0;
-
   // Derive minimumDate from the departure date so hotel pickers can't go into the past
   const tripMinDate = useMemo(() => {
     if (!draft.departureDate) return new Date();
@@ -26,7 +23,7 @@ export default function UmrahDetailsScreen() {
 
   const makkahSection = (
     <Section icon="business" tint={Palette.gold} title="Stay in Makkah">
-      <HotelForm city="Makkah" hotel={draft.makkahHotel} update={updateMakkah} required minimumDate={tripMinDate} />
+      <HotelForm city="Makkah" hotel={draft.makkahHotel} update={updateMakkah} minimumDate={tripMinDate} />
     </Section>
   );
 
@@ -41,13 +38,12 @@ export default function UmrahDetailsScreen() {
       step={3}
       total={4}
       title={'A few\ndetails'}
-      subtitle="Just your name and where you'll be staying — everything else we handle."
+      subtitle="Add what you know. Your name and stays are optional, and you can update them later."
       primaryLabel="Continue"
-      primaryDisabled={!canContinue}
       onPrimary={() => router.push('/umrah-setup/review')}
     >
       <Section icon="person" tint={Palette.gold} title="Pilgrim">
-        <Field label="Your name" required>
+        <Field label="Your name (optional)">
           <Input
             value={draft.pilgrimName}
             onChangeText={(v) => update({ pilgrimName: v })}

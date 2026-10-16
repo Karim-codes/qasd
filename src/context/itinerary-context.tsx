@@ -7,6 +7,8 @@ import {
   loadOriginalTripRecord,
 } from '@/lib/storage';
 import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { carryPreparationToTrip } from '@/lib/preparation-storage';
 import { itineraryFromTripRecord, mergeItineraryIntoTripRecord, normalizeItinerary } from '@/lib/trip';
 import type { Itinerary, Pilgrim, Trip, TripRecord } from '@/lib/types';
 
@@ -48,7 +50,16 @@ export function ItineraryProvider({ children }: { children: React.ReactNode }) {
 
   const setItinerary = useCallback(async (data: Itinerary) => {
     const identified = { ...data, localId: data.localId ?? `trip-${Date.now()}-${Math.random().toString(36).slice(2)}` };
-    const next = normalizeItinerary(identified);
+    const next = current.current?.trip.id === identified.localId
+      ? mergeItineraryIntoTripRecord(current.current, identified)
+      : normalizeItinerary(identified);
+    if (!current.current) {
+      try {
+        await carryPreparationToTrip(AsyncStorage, next.trip.id, next.trip.primaryPilgrimId);
+      } catch {
+        Alert.alert('Checklist not copied', 'Your earlier checklist is still saved separately on this device. It could not be copied into this trip.');
+      }
+    }
     if (!await saveTripRecord(next)) {
       Alert.alert('Trip not saved', 'Please try again. Your trip could not be saved on this device.');
       throw new Error('Could not save itinerary');
