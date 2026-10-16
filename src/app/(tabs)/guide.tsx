@@ -1,5 +1,5 @@
-import { Redirect } from 'expo-router';
+import UmrahGuideScreen from '@/app/umrah-guide';
 
-export default function GuideShortcut() {
-  return <Redirect href="/umrah-guide" />;
+export default function GuideTab() {
+  return <UmrahGuideScreen embedded />;
 }

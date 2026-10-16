@@ -40,7 +40,7 @@ export function OnboardingShell({ step, total, title, subtitle, children, primar
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background }, flex: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingHorizontal: 24, paddingTop: 10, paddingBottom: 18, width: '100%', maxWidth: 640, alignSelf: 'center' },
-  back: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: C.line, justifyContent: 'center', alignItems: 'center' },
+  back: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
   progress: { flexDirection: 'row', gap: 6, marginHorizontal: 24, marginBottom: 26, maxWidth: 592, width: '88%', alignSelf: 'center' },
   segment: { flex: 1, height: 3, borderRadius: 2, backgroundColor: C.line },
   body: { paddingHorizontal: 24, paddingBottom: 24, width: '100%', maxWidth: 640, alignSelf: 'center' },

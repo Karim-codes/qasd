@@ -1,3 +1,5 @@
+import { useTabContentInset } from '@/hooks/use-tab-content-inset';
+import { TripEmptyState } from '@/components/trip-empty-state';
 import { AppIcon } from '@/components/app-icon';
 import { LocalSaveStatus } from '@/components/local-save-status';
 import { QasdFonts } from '@/constants/qasd-theme';
@@ -38,7 +40,7 @@ function JourneyStop({ step, completed, isNext, disabled, onToggle, last }: {
   return <View style={[s.stop, !last && s.stopBorder, isNext && s.nextStop]}>
     <View style={s.stopRow}>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Details for ${step.title}`} accessibilityState={{ expanded }} onPress={() => setExpanded(value => !value)} activeOpacity={0.75} style={s.stopMain}>
-        <View style={[s.stopIcon, isNext && s.nextIcon]}><AppIcon name={step.icon} size={22} color={isNext ? C.paper : '#d5c7aa'} /></View>
+        <View style={s.stopIcon}><AppIcon name={step.icon} size={22} color={isNext ? C.paper : '#d5c7aa'} /></View>
         <View style={s.flex}>
           <Text style={[s.stopTitle, isNext && { color: C.paper }]}>{step.title}</Text>
           <Text style={s.stopSubtitle}>{step.subtitle}</Text>
@@ -62,6 +64,7 @@ function JourneyStop({ step, completed, isNext, disabled, onToggle, last }: {
 }
 
 export default function JourneyTab() {
+  const contentInset = useTabContentInset();
   const { itinerary, trip } = useItinerary();
   const progress = useJourneyProgress();
   const guide = useGuideProgress();
@@ -69,7 +72,7 @@ export default function JourneyTab() {
   const router = useRouter();
   const [selected, setSelected] = useState('all');
   const now = new Date(useNow());
-  if (!itinerary || !trip) return null;
+  if (!itinerary || !trip) return <TripEmptyState />;
   const { tripType, phases } = buildSteps(itinerary, now);
   const steps = phases.flatMap(phase => phase.steps);
   const done = steps.filter(step => progress.value[step.id]).length;
@@ -86,7 +89,7 @@ export default function JourneyTab() {
   };
 
   return <SafeAreaView style={s.container} edges={['top']}>
-    <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={[s.content, { paddingBottom: contentInset }]} showsVerticalScrollIndicator={false}>
       <View style={s.headingRow}>
         <View style={s.flex}><Text style={T.eyebrow}>{tripType === 'umrah' ? 'YOUR UMRAH' : 'YOUR HAJJ'}</Text><Text style={[T.title, { marginTop: 8 }]}>The journey</Text></View>
         <View style={s.headingIcon}><AppIcon name="map-outline" size={25} color={C.gold} /></View>
@@ -103,7 +106,7 @@ export default function JourneyTab() {
         <View style={s.paperDivider} />
         <View style={s.between}><Text style={s.progressLabel}>{finished ? 'Your journey, remembered.' : 'A little closer with every step.'}</Text><Text style={s.progressCount}>{progress.ready ? `${done}/${steps.length}` : '—'}</Text></View>
         <View style={s.progressTrack}><View style={[s.progressFill, { width: `${progress.ready ? done / Math.max(1, steps.length) * 100 : 0}%` }]} /></View>
-        {actionReady && <TouchableOpacity accessibilityRole="button" onPress={() => router.push(action.step ? { pathname: '/umrah-guide', params: { step: action.step } } : action.route)} style={s.nextAction}>
+        {actionReady && <TouchableOpacity accessibilityRole="button" onPress={() => router.push(action.step ? { pathname: '/umrah-guide', params: { step: action.step, mode: action.destination.params?.mode ?? 'learn' } } : action.route)} style={s.nextAction}>
           <View style={s.flex}><Text style={s.nextActionLabel}>{action.eyebrow.toUpperCase()}</Text><Text style={s.nextActionTitle}>{action.title}</Text></View><AppIcon name="arrow-forward" size={20} color={C.paper} />
         </TouchableOpacity>}
       </View>
@@ -135,7 +138,7 @@ const s = StyleSheet.create({
   content: { paddingHorizontal: 24, paddingTop: 24, paddingBottom: 120, width: '100%', maxWidth: 640, alignSelf: 'center' },
   flex: { flex: 1, minWidth: 0 },
   headingRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  headingIcon: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.line },
+  headingIcon: { alignItems: 'center', justifyContent: 'center' },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
   tripCard: { backgroundColor: C.paper, borderRadius: 22, padding: 22 },
   paperEyebrow: { ...T.eyebrow, color: C.paperMuted, flex: 1 },
@@ -158,7 +161,7 @@ const s = StyleSheet.create({
   filterTextSelected: { color: C.ink },
   phase: { marginBottom: 28 },
   phaseHeading: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
-  phaseNumber: { width: 38, height: 38, borderRadius: 14, backgroundColor: C.iconSurface, justifyContent: 'center', alignItems: 'center' },
+  phaseNumber: { justifyContent: 'center', alignItems: 'center' },
   phaseCount: { ...T.label, color: '#c8b78f' },
   stops: { borderRadius: 20, overflow: 'hidden', backgroundColor: C.surface },
   stop: { padding: 16 },
@@ -166,8 +169,7 @@ const s = StyleSheet.create({
   nextStop: { backgroundColor: '#25372f' },
   stopRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   stopMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64 },
-  stopIcon: { width: 40, height: 46, borderRadius: 12, backgroundColor: C.iconSurface, alignItems: 'center', justifyContent: 'center' },
-  nextIcon: { backgroundColor: '#34483b' },
+  stopIcon: { alignItems: 'center', justifyContent: 'center' },
   stopTitle: { fontFamily: QasdFonts.bodyMedium, fontSize: 15, color: C.cream, lineHeight: 21 },
   stopSubtitle: { ...T.label, marginTop: 4 },
   stopMeta: { ...T.label, fontSize: 11, marginTop: 6, color: '#c0b59f' },

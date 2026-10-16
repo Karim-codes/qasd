@@ -1,11 +1,15 @@
+import { useTabContentInset } from '@/hooks/use-tab-content-inset';
+import { TripEmptyState } from '@/components/trip-empty-state';
 import EditableField from '@/components/editable-field';
 import { TravelColors as C, TravelType } from '@/constants/travel-design';
 import { Palette, QasdFonts } from '@/constants/qasd-theme';
 import { useItinerary } from '@/context/itinerary-context';
 import { formatDate } from '@/lib/date-helpers';
+import { hasFlightDetails } from '@/lib/flights';
 import type { Flight } from '@/lib/types';
 import { AppIcon as Ionicons } from '@/components/app-icon';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     Animated,
@@ -164,6 +168,8 @@ function BoardingPassCard({
 }
 
 export default function FlightsTab() {
+  const router = useRouter();
+  const contentInset = useTabContentInset();
   const { itinerary } = useItinerary();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -171,19 +177,26 @@ export default function FlightsTab() {
     Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
   }, [fadeAnim]);
 
-  if (!itinerary) return null;
+  if (!itinerary) return <TripEmptyState flights />;
 
   const isUmrah = itinerary.tripType === 'umrah';
+  const noFlights = !hasFlightDetails(itinerary.flights.outbound) && !hasFlightDetails(itinerary.flights.return);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={[styles.scrollContent, { paddingBottom: contentInset }]} showsVerticalScrollIndicator={false}>
         <View style={styles.headerSection}>
           <Text style={styles.screenTitle}>Your flights</Text>
           <Text style={styles.screenSubtitle}>
             {isUmrah ? 'Umrah' : 'Hajj'} · Your journey, there and back
           </Text>
         </View>
+
+        {noFlights && <View style={styles.emptyFlights}>
+          <Text style={styles.emptyFlightsTitle}>No flight details added yet</Text>
+          <Text style={styles.emptyFlightsBody}>Your planned route is saved below. Add your airline and times when you book. You can keep learning and preparing in the meantime.</Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/checklist')} style={styles.emptyFlightsAction}><Text style={styles.emptyFlightsLink}>Open preparation</Text><Ionicons name="arrow-forward" size={18} color={C.gold} /></TouchableOpacity>
+        </View>}
 
         <Animated.View style={{ opacity: fadeAnim, gap: 14 }}>
           <BoardingPassCard
@@ -214,6 +227,11 @@ const styles = StyleSheet.create({
   headerSection: { marginBottom: 25 },
   screenTitle: { ...TravelType.title },
   screenSubtitle: { fontFamily: QasdFonts.body, fontSize: 13, color: C.muted, marginTop: 5 },
+  emptyFlights: { paddingBottom: 20, marginBottom: 20, borderBottomWidth: 1, borderBottomColor: C.line },
+  emptyFlightsTitle: { fontFamily: QasdFonts.bodySemiBold, fontSize: 18, lineHeight: 25, color: C.cream },
+  emptyFlightsBody: { fontFamily: QasdFonts.body, fontSize: 14, lineHeight: 22, color: C.muted, marginTop: 8 },
+  emptyFlightsAction: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44, marginTop: 8 },
+  emptyFlightsLink: { fontFamily: QasdFonts.bodyMedium, fontSize: 14, color: C.gold },
   boardingPass: { backgroundColor: C.paper, borderRadius: 24, overflow: 'hidden' },
   ticketRibbon: { backgroundColor: C.forest, paddingHorizontal: 20, paddingVertical: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   ribbonText: { color: C.paper, fontFamily: QasdFonts.bodySemiBold, fontSize: 9, letterSpacing: 1.3 },

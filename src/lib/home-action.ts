@@ -1,4 +1,4 @@
-import { checklistSummary, EMPTY_CHECKLIST, type ChecklistProgress } from './checklist';
+import { checklistItems, checklistSummary, EMPTY_CHECKLIST, type ChecklistProgress } from './checklist';
 import { daysUntil } from './date-helpers';
 import { buildSteps, getNextJourneyStep } from './journey';
 import { EMPTY_GUIDE, type GuideProgress } from './progress';
@@ -72,11 +72,11 @@ function activeRitualAction(guide: GuideProgress): NextJourneyAction | null {
   const step = tawaf ? 'tawaf-start' : 'sai-laps';
   return action({
     type: 'ritual',
-    eyebrow: 'Ritual in progress',
+    eyebrow: 'Your saved counter',
     title: tawaf ? 'Continue Tawaf' : 'Continue Sa’i',
     subtitle: `${active.count} of 7 ${tawaf ? 'rounds' : 'lengths'} saved. Continue when you are ready.`,
     ctaLabel: 'Continue counter',
-    destination: { pathname: '/umrah-guide', params: { step } },
+    destination: { pathname: '/umrah-guide', params: { step, mode: 'perform' } },
     priority: 96,
     sourceEventId: `ritual:${active.id}`,
   });
@@ -154,7 +154,7 @@ export function getNextJourneyAction(trip: Trip, state: PilgrimTripProgress, cur
     candidates.push(action({
       type: 'ritual', eyebrow: 'Tawaf complete', title: 'Continue your Umrah',
       subtitle: 'Continue with the guidance after Tawaf, then begin Sa’i.', ctaLabel: 'Continue the guide',
-      destination: { pathname: '/umrah-guide', params: { step: 'tawaf-prayer' } }, priority: 90,
+      destination: { pathname: '/umrah-guide', params: { step: 'tawaf-prayer', mode: 'perform' } }, priority: 90,
       sourceEventId: 'ritual:after-tawaf',
     }));
   }
@@ -167,17 +167,18 @@ export function getNextJourneyAction(trip: Trip, state: PilgrimTripProgress, cur
     candidates.push(action({
       type: 'ritual', eyebrow: 'Pick up where you left off', title: nextGuideStep.title,
       subtitle: `${nextGuideStep.phase} · Step ${UMRAH_STEPS.indexOf(nextGuideStep) + 1} of ${UMRAH_STEPS.length}`,
-      ctaLabel: 'Continue the guide', destination: { pathname: '/umrah-guide', params: { step: nextGuideStep.id } },
+      ctaLabel: 'Continue the guide', destination: { pathname: '/umrah-guide', params: { step: nextGuideStep.id, mode: 'perform' } },
       priority: 74, sourceEventId: `guide:${nextGuideStep.id}`,
     }));
   }
 
   const preparation = checklistSummary(state.checklist);
-  if (preparation.remaining > 0 && departure !== null && departure >= 0) {
+  if (preparation.remaining > 0 && ((departure !== null && departure >= 0) || (trip.tripType === 'umrah' && departure === null))) {
+    const nextItem = checklistItems(state.checklist).find(item => !state.checklist.completed[item.id]);
     candidates.push(action({
-      type: 'checklist', eyebrow: departure <= 7 ? 'Before you travel' : 'Prepare at your pace',
-      title: 'Complete your preparation', subtitle: `${preparation.completed} of ${preparation.total} items complete.`,
-      ctaLabel: 'Open checklist', destination: { pathname: '/checklist' }, priority: departure <= 7 ? 72 : 52,
+      type: 'checklist', eyebrow: departure !== null && departure <= 7 ? 'Before you travel' : 'Prepare at your pace',
+      title: 'Complete your preparation', subtitle: `${preparation.completed} of ${preparation.total} items complete.${nextItem ? ` Next on your list: ${nextItem.title}.` : ''}`,
+      ctaLabel: 'Open checklist', destination: { pathname: '/checklist' }, priority: departure !== null && departure <= 7 ? 72 : trip.tripType === 'umrah' ? 70 : 52,
       sourceEventId: 'checklist:preparation',
     }));
   }

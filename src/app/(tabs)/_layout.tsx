@@ -1,9 +1,13 @@
 import { Palette, QasdFonts } from '@/constants/qasd-theme';
 import { AppIcon as Ionicons } from '@/components/app-icon';
 import { BlurView } from 'expo-blur';
-import { Tabs, useRouter } from 'expo-router';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Tabs } from 'expo-router';
+import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
+import React, { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Platform, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TAB_BAR_GAP, TAB_BAR_HEIGHT } from '@/hooks/use-tab-content-inset';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -34,11 +38,7 @@ function TabIcon({
   return (
     <View style={styles.tabIconContainer}>
       <Animated.View
-        style={[
-          styles.iconPlate,
-          focused && styles.iconPlateActive,
-          { transform: [{ translateY }] },
-        ]}
+        style={{ transform: [{ translateY }] }}
       >
         <Ionicons name={focused ? name : nameOutline} size={22} color={color} />
       </Animated.View>
@@ -47,20 +47,74 @@ function TabIcon({
 }
 
 export default function TabsLayout() {
-  const router = useRouter();
+  return Platform.OS === 'ios' ? <NativeIosTabs /> : <GlassTabs />;
+}
 
+function NativeIosTabs() {
   return (
+    <NativeTabs
+      tintColor={Palette.gold}
+      iconColor={{ default: Palette.textMuted, selected: Palette.gold }}
+      labelStyle={{
+        default: { fontFamily: QasdFonts.bodyMedium, fontSize: 11, color: Palette.textMuted },
+        selected: { color: Palette.gold },
+      }}
+      // Leave the background to UIKit so iOS 26 can render Liquid Glass.
+      blurEffect="systemThinMaterialDark"
+      disableTransparentOnScrollEdge
+      minimizeBehavior="never"
+    >
+      <NativeTabs.Trigger name="index">
+        <Icon sf={{ default: 'house', selected: 'house.fill' }} />
+        <Label>Home</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="guide">
+        <Icon sf={{ default: 'book', selected: 'book.fill' }} />
+        <Label>Guide</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="journey">
+        <Icon sf={{ default: 'map', selected: 'map.fill' }} />
+        <Label>Journey</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="flights">
+        <Icon sf="airplane" />
+        <Label>Flights</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="settings">
+        <Icon sf={{ default: 'gearshape', selected: 'gearshape.fill' }} />
+        <Label>Settings</Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
+  );
+}
+
+function GlassTabs() {
+  const insets = useSafeAreaInsets();
+  const bottom = Math.max(insets.bottom, 12) + TAB_BAR_GAP;
+  const [reduceTransparency, setReduceTransparency] = useState(false);
+  useEffect(() => {
+    if (Platform.OS !== 'ios') return;
+    let cancelled = false;
+    void AccessibilityInfo.isReduceTransparencyEnabled().then(value => { if (!cancelled) setReduceTransparency(value); });
+    const subscription = AccessibilityInfo.addEventListener('reduceTransparencyChanged', setReduceTransparency);
+    return () => { cancelled = true; subscription.remove(); };
+  }, []);
+  return <View style={styles.container}>
     <Tabs
+      safeAreaInsets={{ bottom: 0 }}
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { bottom }],
         tabBarActiveTintColor: Palette.gold,
         tabBarInactiveTintColor: Palette.textMuted,
         tabBarLabelStyle: styles.tabLabel,
+        tabBarLabelPosition: 'below-icon',
         tabBarHideOnKeyboard: true,
-        tabBarBackground: () => (
-          <BlurView tint="dark" intensity={72} style={StyleSheet.absoluteFill} />
-        ),
+        tabBarBackground: () => <View style={[StyleSheet.absoluteFill, styles.glass, reduceTransparency && styles.opaqueGlass]}>
+          {!reduceTransparency && <BlurView tint="systemThinMaterialDark" intensity={85} style={StyleSheet.absoluteFill} />}
+          <LinearGradient colors={['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.035)', 'rgba(255,255,255,0.015)']} locations={[0, 0.46, 1]} style={StyleSheet.absoluteFill} />
+          <View style={styles.glassEdge} />
+        </View>,
       }}
     >
       <Tabs.Screen
@@ -76,27 +130,6 @@ export default function TabsLayout() {
         name="guide"
         options={{
           title: 'Guide',
-          tabBarButton: ({
-            accessibilityLabel,
-            accessibilityState,
-            children,
-            onLongPress,
-            style,
-            testID,
-          }) => (
-            <TouchableOpacity
-              accessibilityLabel={accessibilityLabel}
-              accessibilityRole="button"
-              accessibilityState={accessibilityState}
-              activeOpacity={0.72}
-              onLongPress={onLongPress ?? undefined}
-              onPress={() => router.push('/umrah-guide')}
-              style={style}
-              testID={testID}
-            >
-              {children}
-            </TouchableOpacity>
-          ),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="book" nameOutline="book-outline" color={color} focused={focused} />
           ),
@@ -120,25 +153,35 @@ export default function TabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="settings" nameOutline="settings-outline" color={color} focused={focused} />
+          ),
+        }}
+      />
     </Tabs>
-  );
+    <LinearGradient pointerEvents="none" colors={['rgba(16,24,39,0)', Palette.background, Palette.background]} locations={[0, 0.28, 1]} style={[styles.floor, { height: bottom }]} />
+  </View>;
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: Palette.background },
+  floor: { position: 'absolute', bottom: 0, left: 0, right: 0 },
+  glass: { borderRadius: 26, overflow: 'hidden', backgroundColor: Platform.OS === 'ios' ? 'rgba(23,34,49,0.32)' : 'rgba(26,38,54,0.95)' },
+  opaqueGlass: { backgroundColor: '#233042' },
+  glassEdge: { ...StyleSheet.absoluteFillObject, borderRadius: 26, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)', borderTopColor: 'rgba(255,255,255,0.3)' },
   tabBar: {
     position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: Platform.OS === 'ios' ? 9 : 7,
-    height: Platform.OS === 'ios' ? 76 : 66,
-    paddingTop: 7,
-    paddingBottom: Platform.OS === 'ios' ? 13 : 8,
-    backgroundColor: 'rgba(16,25,45,0.78)',
-    borderWidth: 1,
-    borderTopWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 25,
-    overflow: 'hidden',
+    marginHorizontal: 16,
+    height: TAB_BAR_HEIGHT,
+    paddingTop: 8,
+    paddingBottom: 8,
+    backgroundColor: 'transparent',
+    borderTopWidth: 0,
+    borderRadius: 26,
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
@@ -147,22 +190,12 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontFamily: QasdFonts.bodyMedium,
-    fontSize: 9,
+    fontSize: 11,
     marginTop: 0,
   },
   tabIconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     height: 32,
-  },
-  iconPlate: {
-    width: 40,
-    height: 30,
-    borderRadius: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconPlateActive: {
-    backgroundColor: 'rgba(201,168,76,0.13)',
   },
 });

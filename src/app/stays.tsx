@@ -25,7 +25,6 @@ export default function StaysScreen() {
       <View style={s.navigation}>
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')} style={s.navButton}><AppIcon name="arrow-back" size={22} color={C.cream} /></TouchableOpacity>
         <Text style={T.eyebrow}>ROOM TO REST</Text>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open trip settings" onPress={() => router.push('/settings')} style={s.navButton}><AppIcon name="settings-outline" size={21} color={C.cream} /></TouchableOpacity>
       </View>
       <Text style={T.title}>Your stays</Text>
       <Text style={[T.body, { marginTop: 8 }]}>{stays.length ? `${stays.length} ${stays.length === 1 ? 'stay' : 'stays'}${datesComplete ? ` · ${totalNights} ${totalNights === 1 ? 'night' : 'nights'}` : ' · Add your dates'}` : 'A place to settle in, wherever you are.'}</Text>
@@ -38,7 +37,7 @@ export default function StaysScreen() {
         <View style={s.emptyIcon}><AppIcon name="bed-outline" size={36} color={C.paperMuted} /></View>
         <Text style={s.emptyTitle}>Your room awaits.</Text>
         <Text style={s.emptyCopy}>Add your hotel and dates to keep your stay details close.</Text>
-        <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/settings')} style={s.emptyButton}><Text style={s.buttonText}>Open trip settings</Text><AppIcon name="arrow-forward" size={19} color={C.paper} /></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/settings')} style={s.emptyButton}><Text style={s.buttonText}>Open trip settings</Text><AppIcon name="arrow-forward" size={19} color={C.paper} /></TouchableOpacity>
       </View>}
 
       {stays.map(({ hotel, city }, index) => {
@@ -70,7 +69,7 @@ export default function StaysScreen() {
           </View>
         </View>;
       })}
-      {stays.length > 0 && <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/settings')} style={s.manage}><AppIcon name="create-outline" size={18} color={C.gold} /><Text style={s.manageText}>Edit itinerary in Settings</Text><AppIcon name="arrow-forward" size={17} color={C.gold} /></TouchableOpacity>}
+      {stays.length > 0 && <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/settings')} style={s.manage}><AppIcon name="create-outline" size={18} color={C.gold} /><Text style={s.manageText}>Edit itinerary in Settings</Text><AppIcon name="arrow-forward" size={17} color={C.gold} /></TouchableOpacity>}
     </ScrollView>
   </SafeAreaView>;
 }
@@ -79,14 +78,14 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
   content: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 40, width: '100%', maxWidth: 640, alignSelf: 'center' },
   navigation: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 26 },
-  navButton: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.line },
+  navButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   routeStrip: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', paddingVertical: 24 },
   routePart: { flexDirection: 'row', alignItems: 'center', marginVertical: 3 },
   routeText: { fontFamily: QasdFonts.bodyMedium, fontSize: 14, color: C.cream, marginLeft: 5 },
   hotelCard: { width: '100%', padding: 22, borderRadius: 22, backgroundColor: C.surface },
   featured: { backgroundColor: C.paper },
   cardTop: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
-  hotelIcon: { width: 48, height: 54, borderRadius: 14, backgroundColor: C.iconSurface, alignItems: 'center', justifyContent: 'center' },
+  hotelIcon: { alignItems: 'center', justifyContent: 'center' },
   flex: { flex: 1, minWidth: 75 },
   cityLabel: { fontFamily: QasdFonts.bodySemiBold, fontSize: 15, marginBottom: 3 },
   badge: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 1, borderColor: '#445044' },
@@ -104,7 +103,7 @@ const s = StyleSheet.create({
   manage: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, minHeight: 56, marginTop: 20 },
   manageText: { fontFamily: QasdFonts.bodyMedium, fontSize: 13, color: C.gold },
   empty: { marginTop: 26, padding: 24, borderRadius: 22, backgroundColor: C.paper },
-  emptyIcon: { width: 68, height: 68, borderRadius: 20, backgroundColor: '#ded5c1', justifyContent: 'center', alignItems: 'center' },
+  emptyIcon: { alignSelf: 'flex-start', justifyContent: 'center', alignItems: 'center' },
   emptyTitle: { ...T.section, color: C.ink, marginTop: 20 },
   emptyCopy: { ...T.body, color: C.paperMuted, marginTop: 8 },
   emptyButton: { backgroundColor: C.forest, borderRadius: 12, minHeight: 54, padding: 16, marginTop: 22, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

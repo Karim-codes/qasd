@@ -44,7 +44,7 @@ export default function ChooseTripScreen() {
     >
       <Animated.View style={[s.card, { backgroundColor, transform: [{ scale }] }]}> 
         <View style={s.cardHead}>
-          <View style={[s.icon, active && s.iconActive]}>
+          <View style={s.icon}>
             <AppIcon name={isUmrah ? 'moon-outline' : 'compass-outline'} size={28} color={active ? C.paperMuted : '#d5c7aa'} />
           </View>
           <Text style={[T.label, active && s.activeMuted]}>{isUmrah ? 'At your own pace' : 'For the days of Hajj'}</Text>
@@ -89,8 +89,7 @@ const s = StyleSheet.create({
   cardPressable: { marginBottom: 18 },
   card: { padding: 24, borderRadius: 22, borderWidth: 1, borderColor: C.line },
   cardHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  icon: { width: 52, height: 56, backgroundColor: C.iconSurface, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
-  iconActive: { backgroundColor: '#ded5c1' },
+  icon: { justifyContent: 'center', alignItems: 'center' },
   cardTitle: { ...T.title, marginTop: 18, marginBottom: 6 },
   activeInk: { color: C.ink },
   activeMuted: { color: C.paperMuted },

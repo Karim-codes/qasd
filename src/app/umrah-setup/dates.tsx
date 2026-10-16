@@ -13,8 +13,8 @@ export default function UmrahDatesScreen() {
 
   const nights = daysBetween(draft.departureDate, draft.returnDate);
   const validOrder = nights === null || nights >= 0;
-  const canContinue =
-    draft.departureDate.length > 0 && draft.returnDate.length > 0 && (nights ?? 0) >= 0;
+  const noDates = !draft.departureDate && !draft.returnDate;
+  const canContinue = noDates || (nights !== null && nights >= 0);
 
   const arrivalCity = routeMadinahFirst(draft.route) ? 'Madinah' : 'Makkah';
 
@@ -31,8 +31,8 @@ export default function UmrahDatesScreen() {
       step={2}
       total={4}
       title={'When are you\ntravelling?'}
-      subtitle="Just your travel dates — we'll shape the rest of your itinerary around them."
-      primaryLabel="Continue"
+      subtitle="Add your dates if you know them. You can plan your trip before anything is booked."
+      primaryLabel={noDates ? 'Add dates later' : 'Continue'}
       primaryDisabled={!canContinue}
       onPrimary={() => router.push('/umrah-setup/details')}
     >
@@ -50,7 +50,6 @@ export default function UmrahDatesScreen() {
           value={draft.departureDate}
           onChange={(v) => update({ departureDate: v })}
           placeholder="Choose your departure date"
-          minimumDate={new Date()}
         />
       </View>
 
@@ -89,7 +88,7 @@ export default function UmrahDatesScreen() {
         <Text style={s.warn}>Your return date is before you depart — please check.</Text>
       )}
 
-      {canContinue && (
+      {canContinue && !noDates && (
         <Text style={s.summary}>
           {formatDateLabel(draft.departureDate)} — {formatDateLabel(draft.returnDate)}
         </Text>
@@ -113,10 +112,6 @@ const s = StyleSheet.create({
     marginBottom: 12,
   },
   iconBubble: {
-    width: 30,
-    height: 30,
-    borderRadius: 10,
-    backgroundColor: Palette.goldMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },

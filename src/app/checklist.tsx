@@ -43,7 +43,7 @@ export default function ChecklistScreen() {
       <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={s.header}>
           <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={s.back}><AppIcon name="chevron-back" size={24} color={C.cream} /></TouchableOpacity>
-          <View style={s.headerCopy}><Text style={T.eyebrow}>BEFORE YOU TRAVEL</Text><Text style={T.title}>Preparation</Text></View>
+          <View style={s.headerCopy}><Text style={T.eyebrow}>BEFORE YOU TRAVEL</Text><Text style={[T.title, { fontFamily: QasdFonts.bodySemiBold, fontSize: 28, lineHeight: 35 }]}>Preparation</Text></View>
           <View style={s.headerIcon}><AppIcon name="checkmark-done-outline" size={24} color={C.gold} /></View>
         </View>
 
@@ -85,7 +85,7 @@ const s = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 24 },
   headerCopy: { flex: 1 },
   back: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', marginLeft: -10 },
-  headerIcon: { width: 48, height: 48, borderRadius: 17, borderWidth: 1, borderColor: C.line, justifyContent: 'center', alignItems: 'center' },
+  headerIcon: { justifyContent: 'center', alignItems: 'center' },
   progressCard: { padding: 22, borderRadius: 22, backgroundColor: C.paper },
   progressLabel: { ...T.eyebrow, color: C.paperMuted },
   progressTitle: { fontFamily: QasdFonts.displayMedium, fontSize: 35, color: C.ink, marginTop: 10 },

@@ -203,10 +203,6 @@ const styles = StyleSheet.create({
     borderColor: Palette.border,
   },
   contactIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.goldMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },

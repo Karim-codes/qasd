@@ -52,6 +52,7 @@ app-example
 
 # personal data / local files
 *.pdf
+!assets/guides/en_omrah.pdf
 simulator_screenshot_*.png
 Hajj - my hajj Itinerary.*
 
