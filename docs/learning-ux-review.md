@@ -18,6 +18,14 @@ Owner/device checks: compare the old screenshots and the updated Maqam, Zamzam a
 
 Journey and Flights already show guest states when no trip exists. Both now offer preparation and the guide; adding a trip is optional. A saved route with dates but no airline/flight numbers/booking reference/times now explains that no flight details have been added and provides preparation access. Planned travel dates are not treated as proof of booking. Partially entered flight information should remain editable.
 
+## Original booklet reader
+
+The reader retains the original cover, title page, conclusion (source page 12) and publisher's back cover (source page 13). It skips only the genuinely blank source page 2, so it presents 12 pages while retaining original PDF page numbers for lesson citations. The footer identifies the source page separately from the reader position.
+
+Each original page now uses one vertical scroll view with an explicitly sized, screen-width image. The old nested horizontal/vertical layout could leave pages invisible. Image loading and errors have visible states. Increasing text size switches content pages to wrapping text; original page images always fit the screen. Text size and view preference survive previous/next and visits to either cover. Print line breaks are reflowed into paragraphs; the original PDF and page images are unchanged.
+
+Owner/device checks: open the cover, skip forward past the blank page, inspect source pages 12 and 13, then enlarge source page 9 and navigate forwards and back. Confirm text grows down the page, no horizontal pan is needed and the selected size remains. Verify on iPhone with larger accessibility text as well as the default size.
+
 ## Proposed navigation study — no tab restructuring yet
 
 Compare the current `Home | Guide | Journey | Flights | Settings` with `Home | Prepare | Guide | My Trip` and a settings/profile button before changing it. Keep the new native glass bar during both variants so visual style does not bias the comparison.

@@ -9,7 +9,7 @@ The source audit on 16 October 2026 is an editorial check, not a fatwa or indepe
 - [Manner of Performing Umrah, by Abdul-Aziz ibn Abdullah ibn Baz](https://risala.prh.gov.sa/storage/contents/117/en_omrah.pdf), distributed by the Presidency of Religious Affairs.
 - Original: `assets/guides/en_omrah.pdf`, 13 pages, 469,987 bytes.
 - SHA-256: `fdcd46018daacb760ef355403f51545e6d9d18a35e75e10ccc6d27ec515110d1`.
-- Page images preserve the original publication, including its title and attribution. Text view is extracted from the same PDF. Read the page image for original formatting and Arabic; the extracted text is not an independently typeset edition.
+- Page images preserve the original publication, including its title and attribution. English text view is extracted from the same PDF with print line breaks removed. The Quranic verse excerpts on pages 8 and 9 were transcribed from the visible originals because the PDF text layer scrambled the Arabic; they also require the scholar's checks. The original PDF and all page images remain unchanged.
 - The booklet attributes itself to a summary issued by Ibn Baz's office on 13/2/1416 AH, Majmu Fatawa wa Maqalat 17/425 (p. 12). PDF and printed page numbers coincide.
 
 ## Changes made by the source audit

@@ -4,6 +4,7 @@
     "slug": "Rawaf-app",
     "version": "1.0.0",
     "orientation": "portrait",
+    "platforms": ["ios"],
     "icon": "./assets/brand/icon.png",
     "scheme": [
       "qasd",
@@ -12,7 +13,8 @@
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
+      "appleTeamId": "T3FWDMWBP8",
       "bundleIdentifier": "com.kemo1999.rawafapp",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
