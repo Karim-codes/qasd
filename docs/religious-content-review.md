@@ -31,7 +31,7 @@ The source audit on 16 October 2026 is an editorial check, not a fatwa or indepe
 
 ## Scholar's review scope
 
-Review the complete shipped experience: `src/lib/umrah-steps.ts`, `src/lib/umrah-lesson-content.ts`, every lesson image and diagram, du'a displays and saved du'as, Perform mode/counter prompts/completion labels, `src/app/hajj-guide.tsx` (including its cited narrations), `src/lib/journey.ts`, preparation advice and the original-book reader. Hajj content has **not** been audited in this change and also needs independent review before Qasd launches.
+Review the complete shipped experience: `src/lib/umrah-steps.ts`, `src/lib/umrah-lesson-content.ts`, every lesson image and diagram, du'a displays and saved du'as, Perform mode/counter prompts/completion labels, `src/app/hajj-guide.tsx` (including its cited narrations), `src/lib/journey.ts`, preparation advice and the original-book reader. Include the four-screen introduction, its guide previews and the decorative original illustrations in `assets/onboarding`. Hajj content has **not** been audited in this change and also needs independent review before Qasd launches.
 
 Confirm obligations versus recommendations; evidence and attribution; Arabic/transliteration/translation; differences of scholarly opinion; women-specific instructions including menstruation and post-natal bleeding; mobility and crowding; and when a pilgrim should ask a scholar about their own situation. Review illustrations for unintended religious instructions, especially first sight, Raml, Idtiba, hair removal and completion.
 

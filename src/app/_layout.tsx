@@ -73,6 +73,7 @@ export default function RootLayout() {
             }}
           >
             <Stack.Screen name="index" />
+            <Stack.Screen name="onboarding" options={{ animation: reduceMotion ? 'none' : 'fade', gestureEnabled: false }} />
             <Stack.Screen name="choose-trip" options={{ presentation: 'card' }} />
             <Stack.Screen name="umrah-setup" options={{ presentation: 'card' }} />
             <Stack.Screen name="hajj-setup" options={{ presentation: 'card' }} />

@@ -16,7 +16,7 @@ function contentFingerprint(base = root) {
       hash.update(relative).update('\0').update(fs.readFileSync(full)).update('\0');
     }
   }
-  for (const directory of ['src', 'assets/guides', 'assets/learning']) visit(directory);
+  for (const directory of ['src', 'assets/guides', 'assets/learning', 'assets/onboarding']) visit(directory);
   return hash.digest('hex');
 }
 

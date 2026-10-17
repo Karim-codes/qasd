@@ -416,6 +416,8 @@ export default function SettingsScreen({ embedded = false }: { embedded?: boolea
           <SettingsRow icon="compass-outline" title="Plan your Hajj" subtitle="Coming soon" />
         </SettingsCard>
         <SettingsCard title="About Qasd">
+          <SettingsRow icon="play-circle-outline" title="Welcome to Qasd" subtitle="Replay the introduction" onPress={() => router.push('/onboarding')} />
+          <SettingsDivider />
           <SettingsRow icon="shield-checkmark-outline" title="Data & privacy" onPress={() => setActiveInfo('privacy')} />
           <SettingsDivider />
           <SettingsRow icon="information-circle-outline" title="About Qasd" onPress={() => setActiveInfo('about')} />
@@ -647,6 +649,8 @@ export default function SettingsScreen({ embedded = false }: { embedded?: boolea
           )}
 
           <SettingsCard title="HELP & LEGAL">
+            <SettingsRow icon="play-circle-outline" title="Welcome to Qasd" subtitle="Replay the introduction" onPress={() => router.push('/onboarding')} />
+            <SettingsDivider />
             <SettingsRow
               icon="help-circle-outline"
               title="Help centre"

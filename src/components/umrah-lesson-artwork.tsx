@@ -44,7 +44,7 @@ function TawafStartGuide() {
   </View>;
 }
 
-export function UmrahLessonArtwork({ kind, compact = false }: { kind: LessonArtwork; compact?: boolean }) {
+export function UmrahLessonArtwork({ kind, compact = false, preview = false }: { kind: LessonArtwork; compact?: boolean; preview?: boolean }) {
   if (kind === 'raml') return <View accessible accessibilityRole="image" accessibilityLabel="Seven Tawaf circuits. Circuits 1, 2 and 3 are highlighted for men’s Raml when space allows. Circuits 4, 5, 6 and 7 are normal walking. Women walk normally in all seven circuits." style={[s.diagram, compact && s.compactDiagram]}>
     <Text style={s.eyebrow}>SEVEN CIRCUITS · TWO PACES</Text>
     <View style={s.lengths}>{Array.from({ length: 7 }, (_, index) => <View key={index} style={[s.length, index < 3 && s.ramlLength]}><Text style={[s.lengthNumber, index < 3 && s.ramlNumber]}>{index + 1}</Text></View>)}</View>
@@ -87,26 +87,26 @@ export function UmrahLessonArtwork({ kind, compact = false }: { kind: LessonArtw
     </>}
   </View>;
 
-  if (kind === 'sai') return <View accessible accessibilityRole="image" accessibilityLabel="Sa’i counting diagram. Safa to Marwa is one length, back to Safa is two. Complete seven lengths, ending at Marwa." style={[s.diagram, compact && s.compactDiagram]}>
-    {!compact && <Text style={s.eyebrow}>COUNT ONE WAY AT A TIME</Text>}
-    <View style={s.hills}><Text style={s.place}>Safa</Text><Text style={s.place}>Marwa</Text></View>
+  if (kind === 'sai') return <View accessible accessibilityRole="image" accessibilityLabel="Sa’i counting diagram. Safa to Marwa is one length, back to Safa is two. Complete seven lengths, ending at Marwa." style={[s.diagram, compact && s.compactDiagram, preview && s.previewDiagram]}>
+    {!compact && !preview && <Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.eyebrow}>COUNT ONE WAY AT A TIME</Text>}
+    <View style={s.hills}><Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.place}>Safa</Text><Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.place}>Marwa</Text></View>
     <View style={s.route}><View style={s.hill} /><View style={s.routeLine} /><AppIcon name="arrow-forward" size={compact ? 15 : 22} color={C.forest} /><View style={s.hill} /></View>
     {!compact && <>
-      <View style={s.routeLabels}><Text style={s.routeText}>1st length →</Text><Text style={s.routeText}>← 2nd length</Text></View>
-      <View style={s.lengths}>{Array.from({ length: 7 }, (_, index) => <View key={index} style={[s.length, index === 6 && s.lastLength]}><Text style={[s.lengthNumber, index === 6 && { color: C.paper }]}>{index + 1}</Text></View>)}</View>
-      <Text style={s.diagramNote}>Start at Safa · Finish at Marwa</Text>
+      <View style={s.routeLabels}><Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.routeText}>1st length →</Text><Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.routeText}>← 2nd length</Text></View>
+      <View style={s.lengths}>{Array.from({ length: 7 }, (_, index) => <View key={index} style={[s.length, index === 6 && s.lastLength]}><Text maxFontSizeMultiplier={preview ? 1 : undefined} style={[s.lengthNumber, index === 6 && { color: C.paper }]}>{index + 1}</Text></View>)}</View>
+      <Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.diagramNote}>Start at Safa · Finish at Marwa</Text>
     </>}
   </View>;
 
-  if (kind === 'tawaf') return <View accessible accessibilityRole="image" accessibilityLabel="Tawaf diagram. Travel anticlockwise around the Ka’bah for seven circuits, keeping it on your left." style={[s.diagram, s.tawaf, compact && s.compactDiagram]}>
-    <View style={[s.circle, compact && s.smallCircle]}>
-      <RitualIcon name="kaaba" size={compact ? 27 : 48} color={C.forest} />
+  if (kind === 'tawaf') return <View accessible accessibilityRole="image" accessibilityLabel="Tawaf diagram. Travel anticlockwise around the Ka’bah for seven circuits, keeping it on your left." style={[s.diagram, s.tawaf, compact && s.compactDiagram, preview && s.previewDiagram]}>
+    <View style={[s.circle, compact && s.smallCircle, preview && s.previewCircle]}>
+      <RitualIcon name="kaaba" size={compact ? 27 : preview ? 36 : 48} color={C.forest} />
       <AppIcon name="arrow-back" size={compact ? 12 : 20} color={C.forest} style={s.north} />
       <AppIcon name="arrow-down" size={compact ? 12 : 20} color={C.forest} style={s.west} />
       <AppIcon name="arrow-forward" size={compact ? 12 : 20} color={C.forest} style={s.south} />
       <AppIcon name="arrow-up" size={compact ? 12 : 20} color={C.forest} style={s.east} />
     </View>
-    {!compact && <View style={s.tawafCopy}><Text style={s.circuitCount}>7</Text><Text style={s.place}>circuits</Text><Text style={s.diagramNote}>Ka’bah on your left</Text></View>}
+    {!compact && <View style={s.tawafCopy}><Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.circuitCount}>7</Text><Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.place}>circuits</Text><Text maxFontSizeMultiplier={preview ? 1 : undefined} style={s.diagramNote}>Ka’bah on your left</Text></View>}
   </View>;
 
   const photos = {
@@ -157,6 +157,8 @@ const s = StyleSheet.create({
   schematicNote: { fontFamily: F.body, fontSize: 10, color: C.paperMuted, marginTop: 14 },
   diagram: { minHeight: 205, padding: 22, borderRadius: 18, backgroundColor: '#dfe5d8', justifyContent: 'center' },
   compactDiagram: { width: 104, height: 86, minHeight: 86, padding: 10, borderRadius: 12 },
+  previewDiagram: { minHeight: 164, padding: 16 },
+  previewCircle: { width: 112, height: 112, borderRadius: 56 },
   eyebrow: { fontFamily: F.bodySemiBold, fontSize: 10, letterSpacing: 1.2, color: C.paperMuted, marginBottom: 22 },
   hills: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   place: { fontFamily: F.bodySemiBold, fontSize: 13, color: C.forest },
