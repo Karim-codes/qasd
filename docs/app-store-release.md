@@ -6,7 +6,11 @@ Prepared 17 October 2026 for the English (U.K.) listing. Bundle ID: `com.kemo199
 
 The current candidate is **1.0.0 (2)**, for iPhone. Hajj planning is labelled Coming soon and does not open from Settings. This beta is for internal review. Religious content has not received the independent qualified-scholar approval requested by the app owner; see [the review record](religious-content-review.md). Complete that review before public launch.
 
-Local archive validation succeeded with Xcode 26.0.1: the bundled application reports version 1.0.0, build 2 and device family `[1]` (iPhone), and contains the Release JavaScript bundle. Archive: `/tmp/Qasd-TestFlight-1.0.0-2.xcarchive`. The initial upload failed because the existing App Store provisioning profile did not include the distribution certificate. Refreshing Apple signing/provisioning requires the owner's approval before retrying. An archive is not proof of a completed TestFlight upload.
+Local archive validation succeeded with Xcode 26.0.1: the bundled application reports version 1.0.0, build 2 and device family `[1]` (iPhone), and contains the Release JavaScript bundle. Archive: `/tmp/Qasd-TestFlight-1.0.0-2.xcarchive`. After the owner's explicit approval, Xcode refreshed signing/provisioning and successfully uploaded the internal-only build to Apple on 17 October 2026 (`Uploaded Qasd`, `EXPORT SUCCEEDED`). Upload log: `/tmp/qasd-testflight-upload.log`.
+
+Apple processing completed. App Store Connect was visually verified to show **build 2, Internal, Testing**, assigned automatically to **Early access internal** (one existing tester). [Build details](https://appstoreconnect.apple.com/teams/1a1d5638-a859-446f-831d-934a3b6b9675/apps/6765889732/testflight/ios/24994238-49f2-4251-96c4-74aaabe3f6b5). Screenshot: `/tmp/qasd-testflight-build-2.png`.
+
+Xcode reported missing upstream framework dSYMs for React, ReactNativeDependencies and Hermes. These were warnings and did not block upload. App symbols were included; crash symbolication inside the affected prebuilt dependencies may be limited.
 
 `scripts/ios/TestFlightExportOptions.plist` requests **TestFlight Internal Only**. Apple will not allow a build uploaded with that flag to be released on the App Store or shared with external testers. After review approval, produce a new build with a higher build number through the checked production path. Do not select this internal-only beta as the eventual App Store release build.
 
