@@ -56,3 +56,11 @@ export function guideTextParagraphs(text: string, sourcePage: number): string[] 
   flush();
   return paragraphs;
 }
+
+// Use explicit dimensions: percentage widths on bundled RN images can retain
+// their intrinsic bitmap size inside a ScrollView and crop the page on iOS.
+export function fitGuidePage(viewportWidth: number, viewportHeight: number, imageWidth: number, imageHeight: number) {
+  const ratio = imageWidth / imageHeight;
+  const width = Math.max(1, Math.min(viewportWidth - 24, (viewportHeight - 24) * ratio));
+  return { width, height: width / ratio };
+}

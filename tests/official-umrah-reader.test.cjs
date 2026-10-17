@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {
-  OFFICIAL_UMRAH_PAGE_NUMBERS, officialGuidePage, initialGuideReaderState,
+  fitGuidePage, OFFICIAL_UMRAH_PAGE_NUMBERS, officialGuidePage, initialGuideReaderState,
   officialGuideReaderReducer: reduce, guideTextParagraphs,
 } = require('../src/lib/official-umrah-reader.ts');
 const sourceText = require('../assets/guides/en_omrah-text.json');
@@ -73,5 +73,14 @@ test('text sizing is bounded and print line breaks reflow into real paragraphs',
     assert.ok(paragraphs.length > 0);
     assert.ok(paragraphs.every(paragraph => !paragraph.includes('\n')));
     assert.notEqual(paragraphs.at(-1), String(page));
+  }
+});
+
+test('original bitmap fits inside small, large and landscape iPhone reading areas', () => {
+  for (const [width, height] of [[320, 400], [440, 690], [690, 250]]) {
+    const page = fitGuidePage(width, height, 1418, 1949);
+    assert.ok(page.width <= width - 24);
+    assert.ok(page.height <= height - 24 + 0.001);
+    assert.ok(Math.abs(page.width / page.height - 1418 / 1949) < 0.001);
   }
 });

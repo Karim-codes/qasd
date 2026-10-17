@@ -2,13 +2,13 @@ import { AppIcon } from '@/components/app-icon';
 import { QasdFonts as F } from '@/constants/qasd-theme';
 import { TravelColors as C } from '@/constants/travel-design';
 import { OFFICIAL_UMRAH_PAGES, OFFICIAL_UMRAH_TEXT } from '@/lib/official-umrah-guide';
-import { guideTextParagraphs, initialGuideReaderState, isGuideArtwork, OFFICIAL_UMRAH_PAGE_NUMBERS, officialGuideReaderReducer, type OfficialUmrahPageNumber } from '@/lib/official-umrah-reader';
+import { fitGuidePage, guideTextParagraphs, initialGuideReaderState, isGuideArtwork, OFFICIAL_UMRAH_PAGE_NUMBERS, officialGuideReaderReducer, type OfficialUmrahPageNumber } from '@/lib/official-umrah-reader';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useReducer, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-function OriginalPage({ page }: { page: OfficialUmrahPageNumber }) {
+function OriginalPage({ page, width, height }: { page: OfficialUmrahPageNumber; width: number; height: number }) {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -16,8 +16,10 @@ function OriginalPage({ page }: { page: OfficialUmrahPageNumber }) {
     <Text style={s.errorText}>This page couldn’t be displayed.</Text>
     <TouchableOpacity accessibilityRole="button" onPress={() => { setFailed(false); setLoading(true); setAttempt(value => value + 1); }} style={s.toolButton}><Text style={s.toolText}>Try again</Text></TouchableOpacity>
   </View>;
-  return <View style={s.imageWrapper}>
-    <Image key={attempt} source={OFFICIAL_UMRAH_PAGES[page]} resizeMode="contain" style={s.image}
+  const source = Image.resolveAssetSource(OFFICIAL_UMRAH_PAGES[page]);
+  const dimensions = fitGuidePage(width, height, source.width, source.height);
+  return <View style={[s.imageWrapper, dimensions]}>
+    <Image key={attempt} source={OFFICIAL_UMRAH_PAGES[page]} resizeMode="contain" style={dimensions}
       accessible accessibilityLabel={page === 1 ? 'Cover: Manner of Performing Umrah. Author: Abdul-Aziz ibn Abdullah ibn Baz. Presidency of Religious Affairs.' : page === 13 ? 'Publisher’s back cover: Presidency of Religious Affairs at the Grand Mosque and the Prophet’s Mosque.' : `Original publication, page ${page}. Text view is available for reading and larger text.`}
       onLoadStart={() => setLoading(true)} onLoadEnd={() => setLoading(false)} onError={() => setFailed(true)} />
     {loading && <View pointerEvents="none" style={s.loading}><ActivityIndicator accessibilityLabel="Loading page" color={C.forest} /></View>}
@@ -28,6 +30,7 @@ export default function OfficialUmrahGuide() {
   const router = useRouter();
   const params = useLocalSearchParams<{ page?: string }>();
   const [{ page, textMode, textScale }, dispatch] = useReducer(officialGuideReaderReducer, params.page, initialGuideReaderState);
+  const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const total = OFFICIAL_UMRAH_PAGE_NUMBERS.length;
   const index = OFFICIAL_UMRAH_PAGE_NUMBERS.indexOf(page);
   const artwork = isGuideArtwork(page);
@@ -43,18 +46,20 @@ export default function OfficialUmrahGuide() {
         <View style={s.flex}><Text accessibilityRole="header" style={s.title}>Ibn Baz’s Umrah guide</Text><Text style={s.publisher}>Presidency of Religious Affairs · English</Text></View>
       </View>
       <View style={s.toolbar}>
-        <Text style={s.offline}>Available offline</Text>
+        <Text style={s.offline}>{artwork ? 'Original · Fit page' : readingText ? `Text size · ${Math.round(textScale * 100)}%` : 'Original · Fit page'}</Text>
         {!artwork && <TouchableOpacity accessibilityRole="button" accessibilityLabel={textMode ? 'Show original page' : 'Read accessible text'} onPress={() => dispatch({ type: 'toggle-view' })} style={s.toolButton}><Text style={s.toolText}>{textMode ? 'Original page' : 'Text view'}</Text></TouchableOpacity>}
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Decrease text size" accessibilityState={{ disabled: !canDecrease }} disabled={!canDecrease} onPress={() => dispatch({ type: 'decrease-text' })} style={[s.iconButton, !canDecrease && s.disabled]}><AppIcon name="remove" size={20} color={C.gold} /></TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Increase text size" accessibilityState={{ disabled: !canIncrease }} disabled={!canIncrease} onPress={() => dispatch({ type: 'increase-text' })} style={[s.iconButton, !canIncrease && s.disabled]}><AppIcon name="add" size={20} color={C.gold} /></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Decrease text size" accessibilityState={{ disabled: !canDecrease }} disabled={!canDecrease} onPress={() => dispatch({ type: 'decrease-text' })} style={[s.iconButton, !canDecrease && s.disabled]}><Text style={s.sizeSmall}>A−</Text></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Increase text size" accessibilityState={{ disabled: !canIncrease }} disabled={!canIncrease} onPress={() => dispatch({ type: 'increase-text' })} style={[s.iconButton, !canIncrease && s.disabled]}><Text style={s.sizeLarge}>A+</Text></TouchableOpacity>
       </View>
-      <View style={s.reader}>
-        <ScrollView key={`${page}:${readingText}`} style={s.scroll} contentContainerStyle={[s.page, readingText ? s.textPage : s.originalPage]} alwaysBounceHorizontal={false} directionalLockEnabled>
-          {readingText ? paragraphs.map((paragraph, paragraphIndex) => {
-            const arabic = /[\u0600-\u06ff]/.test(paragraph) && !/[A-Za-z]/.test(paragraph);
-            return <Text key={paragraphIndex} selectable style={[s.pageText, { fontSize: 17 * textScale, lineHeight: 28 * textScale }, arabic && s.arabic]}>{paragraph}</Text>;
-          }) : <OriginalPage key={page} page={page} />}
-        </ScrollView>
+      <View style={s.reader} onLayout={({ nativeEvent: { layout } }) => setViewport({ width: layout.width, height: layout.height })}>
+        {viewport.width > 0 && (readingText ?
+          <ScrollView key={`${page}:text`} style={s.scroll} contentContainerStyle={[s.textPage, { width: viewport.width }]} alwaysBounceHorizontal={false} showsHorizontalScrollIndicator={false} directionalLockEnabled>
+            <Text style={s.readingLabel}>TEXT VIEW · ORIGINAL PAGE {page}</Text>
+            {paragraphs.map((paragraph, paragraphIndex) => {
+              const arabic = /[\u0600-\u06ff]/.test(paragraph) && !/[A-Za-z]/.test(paragraph);
+              return <Text key={paragraphIndex} selectable style={[s.pageText, { fontSize: 16 * textScale, lineHeight: 25 * textScale }, arabic && s.arabic]}>{paragraph}</Text>;
+            })}
+          </ScrollView> : <OriginalPage key={page} page={page} width={viewport.width} height={viewport.height} />)}
       </View>
       <View style={s.pagination}>
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Previous page" accessibilityState={{ disabled: index === 0 }} disabled={index === 0} style={[s.pageButton, index === 0 && s.disabled]} onPress={() => dispatch({ type: 'previous' })}><AppIcon name="chevron-back" size={20} color={C.gold} /><Text style={s.toolText}>Previous</Text></TouchableOpacity>
@@ -77,16 +82,16 @@ const s = StyleSheet.create({
   iconButton: { width: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   toolButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
   toolText: { fontFamily: F.bodyMedium, fontSize: 12, color: C.gold },
-  reader: { flex: 1, backgroundColor: '#d8d5cd' },
+  reader: { flex: 1, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: '#d8d5cd' },
   scroll: { flex: 1, width: '100%' },
-  page: { flexGrow: 1, width: '100%' },
-  originalPage: { padding: 12 },
-  imageWrapper: { width: '100%' },
-  image: { width: '100%', aspectRatio: 340.2 / 467.76, backgroundColor: '#fff' },
+  imageWrapper: { backgroundColor: '#fff' },
+  sizeSmall: { fontFamily: F.bodyMedium, fontSize: 15, color: C.gold },
+  sizeLarge: { fontFamily: F.bodyMedium, fontSize: 19, color: C.gold },
+  readingLabel: { fontFamily: F.bodyMedium, fontSize: 10, letterSpacing: 1, color: '#66645d', marginBottom: 20 },
   loading: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
   loadError: { minHeight: 180, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
   errorText: { fontFamily: F.body, fontSize: 15, color: '#202b2a', textAlign: 'center' },
-  textPage: { padding: 24, backgroundColor: '#fff' },
+  textPage: { flexGrow: 1, padding: 22, backgroundColor: '#fff' },
   pageText: { alignSelf: 'stretch', color: '#202b2a', fontFamily: F.body, marginBottom: 18 },
   arabic: { writingDirection: 'rtl', textAlign: 'right', fontFamily: undefined },
   pagination: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6 },
