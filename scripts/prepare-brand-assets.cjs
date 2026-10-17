@@ -21,7 +21,7 @@ const root = path.resolve(__dirname, '..');
   fs.writeFileSync(path.join(root, 'assets/brand/adaptive-icon.png'), await compositeImagesAsync({ foreground: foreground.source, background, x: 160, y: 160 }));
   await generate(64, 'assets/brand/favicon.png');
   // Refresh an existing local native project, when present. Expo config handles future prebuilds.
-  const catalog = 'ios/RawafHajj/Images.xcassets';
+  const catalog = 'ios/Qasd/Images.xcassets';
   if (fs.existsSync(path.join(root, catalog))) {
     await generate(1024, `${catalog}/AppIcon.appiconset/App-Icon-1024x1024@1x.png`);
     for (const [size, suffix] of [[200, ''], [400, '@2x'], [600, '@3x']]) {
