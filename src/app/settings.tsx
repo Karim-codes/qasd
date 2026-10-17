@@ -413,7 +413,7 @@ export default function SettingsScreen({ embedded = false }: { embedded?: boolea
         <SettingsCard title="Your journey">
           <SettingsRow icon="airplane-outline" title="Plan your Umrah" subtitle="Set up your Umrah journey" onPress={() => router.push('/umrah-setup/destination')} />
           <SettingsDivider />
-          <SettingsRow icon="compass-outline" title="Plan your Hajj" subtitle="Set up your Hajj journey" onPress={() => router.push('/hajj-setup/welcome')} />
+          <SettingsRow icon="compass-outline" title="Plan your Hajj" subtitle="Coming soon" />
         </SettingsCard>
         <SettingsCard title="About Qasd">
           <SettingsRow icon="shield-checkmark-outline" title="Data & privacy" onPress={() => setActiveInfo('privacy')} />

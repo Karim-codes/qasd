@@ -16,6 +16,7 @@
       "supportsTablet": false,
       "appleTeamId": "T3FWDMWBP8",
       "bundleIdentifier": "com.kemo1999.rawafapp",
+      "buildNumber": "2",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
