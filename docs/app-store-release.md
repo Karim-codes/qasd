@@ -1,14 +1,14 @@
 # Qasd: TestFlight and App Store release
 
-Prepared 17 October 2026 for the English (U.K.) listing. Bundle ID: `com.kemo1999.rawafapp`. Apple ID: `6765889732`. Apple team: `T3FWDMWBP8`.
+Updated 18 October 2026 for the English (U.K.) listing. Bundle ID: `com.kemo1999.rawafapp`. Apple ID: `6765889732`. Apple team: `T3FWDMWBP8`.
 
 ## Current beta and launch requirement
 
-The current candidate is **1.0.0 (2)**, for iPhone. Hajj planning is labelled Coming soon and does not open from Settings. This beta is for internal review. Religious content has not received the independent qualified-scholar approval requested by the app owner; see [the review record](religious-content-review.md). Complete that review before public launch.
+The current candidate is **1.0.0 (3)**, for iPhone, including the illustrated four-screen introduction. Hajj planning is labelled Coming soon and does not open from Settings. This beta is for internal review. Religious content has not received the independent qualified-scholar approval requested by the app owner; see [the review record](religious-content-review.md). Complete that review before public launch.
 
-Local archive validation succeeded with Xcode 26.0.1: the bundled application reports version 1.0.0, build 2 and device family `[1]` (iPhone), and contains the Release JavaScript bundle. Archive: `/tmp/Qasd-TestFlight-1.0.0-2.xcarchive`. After the owner's explicit approval, Xcode refreshed signing/provisioning and successfully uploaded the internal-only build to Apple on 17 October 2026 (`Uploaded Qasd`, `EXPORT SUCCEEDED`). Upload log: `/tmp/qasd-testflight-upload.log`.
+Local archive validation succeeded with Xcode 26.0.1: the bundled application reports version 1.0.0, build 3 and device family `[1]` (iPhone), and contains the Release JavaScript bundle and both onboarding illustrations. The bundled illustrations' SHA-256 hashes match the source assets. Typecheck and all 43 unit tests passed. Archive: `/tmp/Qasd-TestFlight-1.0.0-3.xcarchive`. Using the owner's existing approval for signing/provisioning refresh, Xcode successfully uploaded the internal-only build to Apple on 18 October 2026 (`Uploaded Qasd`, `EXPORT SUCCEEDED`). Upload log: `/tmp/qasd-testflight-3-upload.log`.
 
-Apple processing completed. App Store Connect was visually verified to show **build 2, Internal, Testing**, assigned automatically to **Early access internal** (one existing tester). [Build details](https://appstoreconnect.apple.com/teams/1a1d5638-a859-446f-831d-934a3b6b9675/apps/6765889732/testflight/ios/24994238-49f2-4251-96c4-74aaabe3f6b5). Screenshot: `/tmp/qasd-testflight-build-2.png`.
+Apple processing completed. App Store Connect was visually verified to show **build 3, Internal, Testing**, assigned automatically to the existing **Early access internal** group, with four invites shown. [Build details](https://appstoreconnect.apple.com/teams/1a1d5638-a859-446f-831d-934a3b6b9675/apps/6765889732/testflight/ios/21e93cf2-45ae-4c08-a2f8-0d939eb7ee55). Screenshot: `/tmp/qasd-testflight-build-3.png`.
 
 Xcode reported missing upstream framework dSYMs for React, ReactNativeDependencies and Hermes. These were warnings and did not block upload. App symbols were included; crash symbolication inside the affected prebuilt dependencies may be limited.
 
@@ -78,7 +78,7 @@ Other fields:
 | Marketing URL | Optional live product website; leave blank if you do not have one. |
 | Copyright | `2026` followed by the actual rights holder's legal name. |
 | Privacy Policy URL | A live public HTTPS policy explaining local storage, deletion, prayer/weather providers and support contact. An in-app sheet alone does not supply this URL. |
-| Build | Select the new public-release build after scholar approval, not the internal-only build 2. |
+| Build | Select a new public-release build after scholar approval, not an internal-only beta. |
 | Game Center | Off. |
 | Release | Manually release this version. |
 
@@ -109,7 +109,9 @@ The app declares `ITSAppUsesNonExemptEncryption: false`; it uses standard HTTPS 
 ## TestFlight testing notes
 
 ```text
-Please test the visual Umrah lessons, the offline Ibn Baz booklet (cover, original pages, closing pages and wrapping text size across page changes), learning versus ritual progress, preparation checklist, guest Journey/Flights prompts and saving/editing an Umrah trip. Hajj planning should say Coming soon and not open. Religious wording is pending independent scholar review; report content issues as well as crashes.
+Please test the new four-screen introduction: first launch, Skip, the Tawaf/Sa'i preview tabs, example checklist, Explore Qasd and Plan my Umrah. Existing trips should remain intact. Replay it from Settings > Welcome to Qasd; completing or skipping it should prevent it appearing on the next normal launch.
+
+Also test the visual Umrah lessons, the offline Ibn Baz booklet (cover, original pages, closing pages and wrapping text size across page changes), learning versus ritual progress, preparation checklist, guest Journey/Flights prompts and saving/editing an Umrah trip. Hajj planning should say Coming soon and not open. Religious wording is pending independent scholar review; report content issues as well as crashes.
 ```
 
 ## References

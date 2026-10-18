@@ -34,4 +34,4 @@ Verified on the iPhone 17 Pro Max and an isolated iPhone 16e simulator. The smal
 
 Typecheck and 43 unit tests passed. Lint has no errors and the same five existing warnings in `hajj-guide.tsx`.
 
-This work is newer than internal TestFlight build **1.0.0 (2)**. A new binary is required to distribute the introduction through TestFlight. The public-release scholar-review requirement remains in place, and the new illustrations are included in the release content fingerprint.
+Distributed in internal TestFlight build **1.0.0 (3)** on 18 October 2026. App Store Connect was verified to show Testing for the existing Early access internal group. The release archive includes both illustrations with hashes matching the source assets. The public-release scholar-review requirement remains in place, and the new illustrations are included in the release content fingerprint.
